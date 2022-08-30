@@ -1,0 +1,2486 @@
+r =
+
+%\def\bel{\begin{equation}\label}
+\def\eeq{\end{equation}}
+\newcommand{\abs}[1]{\left| #1 \right|}
+\def\beqn{\begin{eqnarray*}}
+\def\eeqn{\end{eqnarray*}}
+\newcommand{\simplot}[1]{\begin{center}
+  \includegraphics[width=0.7\textwidth]{#1}
+\end{center}}
+
+    29
+    >> [x, nit] = sor(A, b, x0, 1.8, 4, 1e-4, 100)
+
+Then, test your function to  compute the summation of all the elements of
+\[A=\begin{bmatrix} 12.2&1.2&2.4 \\ 2&3&4 \\ 2.5&6.2&3.4\\
+\end{bmatrix}.\]
+
+   0.666666665646361
+\end{minted}
+Use the quadl to get the result is bigger than use the quad to the result. And quad is using recursive
+    adaptive Simpson quadrature. And quadl is using high order
+    recursive adaptive quadrature
+\newpage
+\subsection{Computing $\pi$ with Romberg}
+\begin{minted}{matlab}
+function fr=frn(x)
+    fr=8*(sqrt(1-x^2)-x);
+end
+>> R=romberg('frn',0,1/sqrt(2),15);
+>> diag(R)
+
+    0.1981
+\end{minted}
+So the intersection is between 0.1981 and 0.4450 
+\newpage
+\subsection{Fixed point iteration}
+\textbf{(a).} 
+We found f(1.1) and f(1.6) are of opposite sign, then, there exists a point c(root), between 1.1 and 1.6, such that f(c)=0.
+\newpage
+\textbf{(b).}
+\[\begin{aligned}
+    &x_1&=f(x_0)+x_0&=e^{-1.6}-cos(1.6)+1.6&=1.8311\\
+    &x_2&=f(x_1)+x_1&=e^{-1.8311}-cos(1.8311)+1.8311&=2.2487\\
+    &x_3&=f(x_2)+x_2&=e^{-2.2487}-cos(2.2487)+2.2487&=2.9814\\
+    &x_4&=f(x_3)+x_3&=e^{-2.9814}-cos(2.9814)+2.9814&=4.0193
+\end{aligned}\]
+We observe that the value is increasing
+Check convergence:
+\[\begin{aligned}
+    &x_5=4.6762\\
+    &x_6=4.7217\\
+    &x_7=4.7213\\
+    &x_8=4.7213 \text{ stop here}
+\end{aligned}\]
+Our approximation to the root is 4.7213.
+\[\begin{aligned}
+    g'(x)&=-e^{-x}+sin(x)+1\\
+    |g'(r)|&=|-e^{-4.7213}+sin(4.7213)+1|=0.0089<1. \text{OK, convergence}
+\end{aligned}\]
+Based on the root we get 4.7213 we said it is convergence
+\newpage
+\textbf{(c).}
+\[\begin{aligned}
+    &x_1=-f(x_0)+x_0&=-e^{-1.6}+cos(1.6)+1.6&=1.3689\\
+    &x_2=-f(x_1)+x_1&=-e^{-1.3689}+cos(1.3689)+1.3689&=1.3150\\
+    &x_3=-f(x_2)+x_2&=-e^{-1.3150}+cos(1.3150)+1.3150&=1.2995\\
+    &x_4=-f(x_3)+x_3&=-e^{-1.2995}+cos(1.2995)+1.2995&=1.2948
+\end{aligned}\]
+We observe that the value is decreasing,But it's getting smaller and smaller.
+\[\begin{aligned}
+    &x_5=1.2934\\
+    &x_6=1.2929\\
+    &x_7=1.2928\\
+    &x_8=1.2927\\
+    &x_9=1.2927\text{ stop here}
+\end{aligned}\]
+Our approximation to the root is 1.2927.
+\[\begin{aligned}
+    g'(x)&=e^{-x}-sin(x)+1\\
+    |g'(r)|&=|e^{-1.2927}-sin(1.2927)+1|=0.3129<1. \text{OK, convergence}
+\end{aligned}\]
+Based on the root we get 1.2927 we said it is convergence
+\newpage
+\subsection{On Newton’s Method}
+\textbf{(a).}
+From the newton's method gives:
+\[\begin{aligned}
+    x_{k+1}&=x_k-\frac{f(x_k)}{f'(x_k)}&=x_k-\frac{x_k^3-R}{3\times x_k^2}&=\frac{1}{3}\times(2x_k^3-\frac{R}{x_k^2}) 
+\end{aligned}\]
+\textbf{(b).}
+From the newton's method gives:
+\[\begin{aligned}
+    x_{k+1}&=x_k-\frac{f(x_k)}{f'(x_k)}&=x_k-\frac{x_k^2-\frac{R}{x_k}}{2\times x_k+\frac{R}{x^2}}
+\end{aligned}\]
+\textbf{(c).}
+From the newton's method gives:
+\[\begin{aligned}
+    x_{k+1}&=x_k-\frac{f(x_k)}{f'(x_k)}&=x_k-\frac{1-\frac{R}{x_k^3}}{\frac{3}{x_k^4}}
+\end{aligned}\]
+\textbf{(d).}
+From the newton's method gives:
+\[\begin{aligned}
+    x_{k+1}&=x_k-\frac{f(x_k)}{f'(x_k)}&=x_k-\frac{\frac{1}{x_k^2}-\frac{x_k}{R}}{-\frac{2}{x_k^3}-\frac{1}{R}} 
+\end{aligned}\]
+\newpage
+\subsection{Newton’s Method in Matlab}
+\textbf{(a).}
+Here is the mynewton.m:
+\begin{minted}{matlab}
+function x=mynewton(f,df,x0,tol,nmax)
+% input variables:
+% f,df are the function f and its derivative f′, 
+% x0 is the initial guess, 
+% tol is the error tolerance, 
+% and nmax is the maximum number of iterations. 
+% Theoutput variable: 
+% x is the result of the Newton iterations. 
+    xx=x0;
+    n=0;
+    dx=f(xx)/df(xx);
+    while( (dx>tol)||(f(xx)>tol))&&(n<nmax)
+        n=n+1;
+        xx=xx-dx;
+        dx=f(xx)/df(xx);
+        fprintf('I have n=%d and xx=%g.\n',n,xx);
+    end
+    x=xx-dx;
+    fprintf('I have x=%f.\n',x);
+end
+\end{minted}
+First, test your function with Example 5.7 in Section 5.4, computing $\sqrt{2}$.
+\begin{minted}{matlab}
+>> f=@(x) x^2-2;
+>> df=@(x) 2*x;
+>> mynewton(f,df,1.4,1e-12,10);
+I have x=1.414286.
+>>  %x is the result of the Newton iterations.
+\end{minted}
+Then, test another we get:
+\begin{minted}{matlab}
+>> f=@(x) exp(-x)-cos(x);
+>> df=@(x) -exp(-x)+sin(x);
+>> x=mynewton(f,df,1.6,1e-12,10);
+I have n=1 and xx=1.31029.
+I have n=2 and xx=1.29281.
+I have n=3 and xx=1.2927.
+I have n=4 and xx=1.2927.
+I have x=1.292696. %x is the result of the Newton iterations.
+\end{minted}
+The root is 1.292696
+\newpage
+\subsection{ When Newton’s Method Does not Work Well.}
+\textbf{(i).} 
+\textbf{(a).}
+From the newton's method gives:
+\[\begin{aligned}
+    x_{k+1}&=x_k-\frac{f(x_k)}{f'(x_k)}&=x_k-\frac{(x_k-1)^m}{m\times (x_k-1)^{m-1}}&=x_k-\frac{x_k-1}{m}=\frac{m\times x_k-x_k+1}{m}\\
+    &=\frac{7\times x_k+1}{8}
+\end{aligned}\]
+\textbf{(b).}
+\[\begin{aligned}
+    &x_1&=\frac{7\times x_0+1}{8}&=1.0875\\
+    &x_2&=\frac{7\times x_1+1}{8}&=1.0765625\\
+    &x_3&=\frac{7\times x_2+1}{8}&=1.067\\
+    &x_4&=\frac{7\times x_3+1}{8}&=1.05861625
+\end{aligned}\]
+\textbf{(c).}
+After each iteration, the $x_k$ get closer and closer to the root r=1.
+\[\begin{array}{c|c|c}
+    e_1 &|g(x_0)-g(1)|& 0.0875\\
+    e_2 &|g(x_1)-g(1)|& 0.0765625\\
+    e_3 &|g(x_2)-g(1)|& 0.067\\
+    e_4 &|g(x_3)-g(1)|& 0.05861625
+\end{array}\]
+It doesn't conforms to quadratic convergence since $e_2=0.0765625>0.0875^2=0.00765625$ and also check the textbook(2nd editor Page128) $f(r)=0$ but $f'(r)$ not equal 0. $f'(r)=7*0^8=0$.The cause is probably
+that $g''(x)=0$. I think it should be linear convergence since $|g'(r)|=\frac{7}{8}<1$\\ from slide chap5-4.
+\textbf{(d).}
+\[\begin{aligned}
+    &x_1&=\frac{19\times x_0+1}{20}&=1.095\\
+    &x_2&=\frac{19\times x_1+1}{20}&=1.09025\\
+    &x_3&=\frac{19\times x_2+1}{20}&=1.0857375\\
+    &x_4&=\frac{19\times x_3+1}{20}&=1.0857375
+\end{aligned}\]
+When m get bigger and bigger, the iteration decreasing get slower and slower. It is not quadratic convergence since $g''(x)=0$.. But it convergence since $|g'(r)|=\frac{19}{20}<1$,then $e_{k+1}<e_k$,error decreases, the iteration convergence.It is linear convergence. from slide chap5-4
+\newpage
+\textbf{(ii).}:\\
+\[f(x)=\frac12+\frac{x^2}4-x\sin{x}-\frac{\cos{2x}}2\]
+Derivative:
+\[f'(x) = \frac x2 - \sin x + \sin{2 x} - x\cos x\]
+Put it in mynewton.m
+\begin{minted}{matlab}
+>> f = @(x) 1 / 2 + x^2 / 4 - x * sin(x) - cos(2 * x) / 2;
+>> df = @(x) x / 2 - sin(x) + sin(2 * x) - x * cos(x);
+>> x=mynewton(f, df, pi / 2, 1e-3, 100);
+I have n=1 and xx=1.7854.
+I have n=2 and xx=1.84456.
+I have n=3 and xx=1.87083.
+I have x=1.883346.
+\end{minted}
+The result seems unusual for Newton's method since the function using trigonometric functions of an angle. 
+\newpage
+\subsection{The Secant Method in Matlab}
+Here is mysecant.m:
+\begin{minted}{matlab}
+function x=mysecant(f,x0,x1,tol,nmax)
+% Here f is the function f, 
+% x0,x1 are the initial guesses, 
+% tol is the error tolerance, 
+% nmax is the maximum number of iterations, 
+% x is the output of your function.
+    xx=x0;
+    xxx=x1;
+    n=0;
+    dx=(f(xxx)-f(xx))/(xxx-xx);
+    while( (dx>tol)||(f(xx)>tol)||f(xxx)>tol )&&(n<nmax)
+        n=n+1;
+        xx=xxx;
+        xxx=xxx-((f(xxx))/dx);
+        dx=(f(xxx)-f(xx))/(xxx-xx);
+        fprintf('I have n=%d and xx=%g and xxx=%g.\n',n,xx,xxx);
+    end
+    x=xxx;
+    fprintf('I have x=%f.\n',x);
+end
+%test for f(x)=x^2-2
+>> f = @(x) x^2 - 2;
+>> x=mysecant(f,1.4,1.41,1e-12,10)
+I have n=1 and xx=1.41 and xxx=1.41423.
+I have n=2 and xx=1.41423 and xxx=1.41421.
+I have n=3 and xx=1.41421 and xxx=1.41421.
+I have n=4 and xx=1.41421 and xxx=1.41421.
+I have n=5 and xx=1.41421 and xxx=1.41421.
+I have n=6 and xx=1.41421 and xxx=1.41421.
+I have n=7 and xx=1.41421 and xxx=1.41421.
+I have x=1.414214.
+x =
+     1.414213562373095e+00
+>> 
+%Test for e^-x-cos(x)
+>> f=@(x) exp(-x)-cos(x);
+>> x=mysecant(f,1.5,1.6,1e-12,10);
+I have n=1 and xx=1.6 and xxx=1.30637.
+I have n=2 and xx=1.30637 and xxx=1.29386.
+I have n=3 and xx=1.29386 and xxx=1.2927.
+I have n=4 and xx=1.2927 and xxx=1.2927.
+I have n=5 and xx=1.2927 and xxx=1.2927.
+I have n=6 and xx=1.2927 and xxx=1.2927.
+I have n=7 and xx=1.2927 and xxx=1.2927.
+I have x=1.292696.
+\end{minted}
+So the result for $f(x)=x^2-2\text{ is the }x=1.414213562373095e+00$. And the result for $e^{-x}-cos(x)\text{ is }x=1.292696 $
+Compare with newton's method, The secant method don't computed f',it has rapid convergence.It is more accurate
+\end{document}
+
+>> 
+\end{minted}
+Absolute errors:
+\[\begin{array}{c|c|c}
+    n & abs error & \text{change when n double} \frac{error(i-1)}{error(i)}\\\hline
+    4 & 0.001834347570474 & NAN\\
+    8 & 0.000458816066020 & 3.9980 \\
+    16 &0.000114718352629 & 3.9995 \\
+    32 &0.000028680484365 & 3.9999 \\
+    64 &0.000007170177108 & 4.0000 \\
+    128&0.000001792547777 & 4.0000 
+\end{array}\]
+\begin{center}
+\includegraphics[width=0.9\textwidth]{43_1.png}
+\end{center}
+Every time I double n, the error goes down by about a factor of four, as I would expect. Because the error is a function of $h^2$, so if we cut h in half, the error is going to be equal to $\frac{1}{2^2}=\frac{1}{4}$ time
+\newpage
+\subsection{Trapezoid rule and Romberg algorithm.}
+\textbf{(a).}When n=1,$h=\frac{1-(-1)}{1}=2,T=2\times [\frac{(f(1)+f(-1)}{2}]=3+3=6$\\
+When n=2,$h=\frac{1-(-1)}{2}=1,T=1\times [\frac{(f(1)+f(-1)}{2}+f(0)]=\frac{3+3}{2}+0=3$
+\newpage
+\textbf{(b).}Romberg algorithm(From slides we know): $U(h)=T(f;\frac{h}{2})+\frac{T(f;\frac{h}{2})-T(f;h)}{2^2-1}=3+\frac{3-6}{3}=3-1=2$. Yes, we get exact value since function given is 2nd order($3x^2$),The Romberg algorithm helps us get the exact value because it evaluates function in terms of the highest degree.
+\newpage
+\subsection{ Romberg Algorithm in Matlab}
+\textbf{(a).} romberg.m file:
+\begin{minted}{matlab}
+function R = romberg(fr,a,b,n)
+%where f is the name of the function where f(x) is implemented, 
+% and a and b definesthe integrating interval, 
+% and n is the size of your Romberg table. 
+% The functionshould return the whole Romberg table. 
+% The best approximation of the interval would be the value in R(n,n).
+R=zeros(n,n);
+h=b-a;
+R(1,1)=((feval(fr,a)+feval(fr,b))*h/2);
+for i=1:n-1
+    R(i+1,1)=R(i,1)/2;
+    h=h/2;
+    for k=1:2^(i-1)
+        R(i+1,1)=R(i+1,1)+h*feval(fr,(a+(2*k-1)*h));
+    end
+end
+for j=2:n
+    for i=j:n
+        R(i,j)=R(i,j-1)+(1/(4^(j-1)-1))*(R(i,j-1)-R(i-1,j-1));
+    end
+end
+end
+\end{minted}
+\newpage
+\textbf{(b).}:\\
+\textbf{(i).} Compute the integral by romberg
+\begin{minted}{matlab}
+function fr=frn(x)
+    fr=sin(x);
+end
+>> R=romberg('frn',0,pi,5)
+
+    0.5000         0         0         0         0
+    0.6036    0.6381         0         0         0
+    0.6433    0.6565    0.6578         0         0
+    0.6581    0.6631    0.6635    0.6636         0
+    0.6636    0.6654    0.6656    0.6656    0.6656
+%Error
+>> diag(abs(diag(R-quad('frn',0,1))))
+
+The goal of this exercise is to get started with Matlab. You will go through:
+\begin{itemize}
+\item Matrices, vectors, solutions of systems of linear equations;
+\item simple plots;
+\item Use of Matlab's own help functions.
+\end{itemize}
+
+    55
+>> [x, nit] = sor(A, b, x0, 1.2, 4, 1e-4, 100)
+
+    0.8292
+    0.6726
+    0.5256
+    0.3845
+    0.2461
+    0.1074
+   -0.0348
+   -0.1835
+   -0.3420
+
+\paragraph{(b).} Convert the decimal numbers to binary. Keep 10 fractional points, if needed.\\
+(i). $(100.01)_{10}$ ~~~~~~~~~~~~~~~~~~~~~\\
+(ii). $(64.625)_{10}$\\
+(iii). $(25)_{10}$ 
+
+\subsection{Converting Numbers  Between Bases}
+\paragraph{(a).} Convert the binary numbers to decimal numbers. \\
+(i). $(110 111 001.101 011 101)_2$ ~~~~~~~~~~~~~~~~~~~~\\
+(ii). $(1 001 100 101.011 01)_2$ \\
+(iii). $(101.01)_2$
+
+   1.0e+15 *
+
+\newpage
+\textbf{(b).}Based on the graph we have we know that $\max_{x\in(a,b)}|f^{(4)}(x)|=1.25$
+\[\begin{aligned}
+    &|E_S(f;h)|\leq \frac{1-0}{180}\times h^4 \times 1.25 \leq 10^{-6} \\
+    &\implies h^4 \leq \frac{180}{1.25}\times 10^{-6} =0.000144\\
+    & \implies \frac{1}{2n}= h \leq 0.109545\\
+    & \implies n \geq \frac{1}{2\times0.109545}=4.56433\\
+    & \implies 2n+1=10.1287
+\end{aligned}\]
+So, the error for Simpson's rule will have at least 11 points.
+\newpage
+\subsection{Trapezoid Rule in Matlab}
+Matlab code trapzoid.m :
+\begin{minted}{matlab}
+function v = trapezoid(f, a, b, n)
+    % where funItg.m is the name of the file of the function f(x), 
+    % and a,b is the interval, 
+    % and n is the number of sub-intervals
+    h = (b - a) / n;
+    x = a + h:h:b - h;
+    v = ((feval(f, a) + feval(f, b)) / 2 + sum(feval(f, x))) * h;
+end
+\end{minted}
+For test:
+\begin{minted}{matlab}
+function fx = funItg(x)
+    f=exp(-x);
+end
+>> format long;
+>> for n=2.^[2:7]
+disp(trapezoid('funItg',0,0.8,n))
+end
+   0.552505383453252
+
+\medskip
+
+\end{document}
+
+$x_1(0.1)=1.1$
+\[x_{n+1}=x_n+\frac{3hf(t_n,x_n)}{2}-\frac{hf(t_{n-1},x_{n-1})}{2}\]
+\[x_2(0.2)=1.1+\frac{3*0.1*1}{2}-\frac{0.1*1}{2}=1.2\]
+\[x_3(0.3)=1.2+\frac{3*0.1*(\frac{0.2*1.2^2}{2}+1)}{2}-\frac{0.1*1.1}{2}=1.3166\]
+\newpage
+\subsection{The Lorenz system; A study in chaoes}
+\textbf{i).}
+\begin{align}
+    10(y-x)=0 \implies &x=y\\
+    28x-y-xz=0 \implies & x(27-z)=0\\
+    xy-\frac{8z}{3}=0
+\end{align}
+if we set x=0,we get y=0 and \[0-\frac{8z}{3}=0 \implies z=0\]
+So we could say x=0,y=0,z=0 is an equilibrium solution
+\textbf{ii.)}
+\begin{minted}{matlab}
+>> rho = 10; b = 8/3; r = 28;
+>> f1 = @(t, x) rho * (x(2) - x(1));
+>> f2 = @(t, x) x(1) * (b - x(3)) - x(2);
+>> f3 = @(t, x) x(1) * x(2) - r * x(3);
+>> ode = @(t, x) [f1(t, x); f2(t, x); f3(t, x)];
+>> [t, x] = ode45(ode, 0:0.1:80, [0 1 0]);
+>> % 3D plot of the Lorenz sxstem
+>> plot3(x(:,1), x(:,2), x(:,3))
+\end{minted}
+\simplot{9_5_ii1.png}
+\begin{minted}{matlab}
+>> % 2D plots of solutions
+>> plot(t, x(:,1), t, x(:,2), t, x(:,3))
+\end{minted}
+\simplot{9_5_ii2.png}
+\begin{minted}{matlab}
+>> % 2D plot of x against y
+>> plot(x(:,1), x(:,2))
+\end{minted}
+\simplot{9_5_ii3.png}
+\begin{minted}{matlab}
+>> % 2D plot of x against z
+>> plot(x(:,1), x(:,3))
+\end{minted}
+\simplot{9_5_ii4.png}
+\begin{minted}{matlab}
+>> % 2D plot of y against z
+>> plot(x(:,2), x(:,3))
+\end{minted}
+\simplot{9_5_ii5.png}
+\newpage
+\subsection{Solving the Airy Equation}
+\[\begin{array}{cc}
+    x'=y & x(0)=0.355028053887817 \\
+    y'=tx & y(0)=-0.258819403792807
+\end{array}\]
+\begin{minted}{matlab}
+>> f = @(t, x) [x(2); t * x(1)];
+x0 = [0.355028053887817 -0.258819403792807];
+[t, x] = rk4(f, 0, x0, -4.5, 10000);
+[t, x] = rk4(f, -4.5, x(:, end), 4.5, 20000);
+x(1, end)
+
+\newpage
+\subsection{Application of System of Linear Equations}
+\textbf{(a).}
+\begin{minted}{matlab}
+>> a = sqrt(2) / 2;
+>> A = sparse([ -a 0 0 1 a  0 0 0 0 0 0 0 0 0 0 0 0
+        ;  a 0 1 0 a  0 0 0 0 0 0 0 0 0 0 0 0
+        % 2
+        ;  0 1 0 0 0 -1 0 0 0 0 0 0 0 0 0 0 0
+        ;  0 0 1 0 0  0 0 0 0 0 0 0 0 0 0 0 0
+        % 3
+        ;  0 0 0 -1 0 0 0 1 0 0 0 0 0 0 0 0 0
+        ;  0 0 0  0 0 0 1 0 0 0 0 0 0 0 0 0 0
+        % 4
+        ; 0 0 0 0 -a -1 0 0 a 1 0 0 0 0 0 0 0
+        ; 0 0 0 0  a  0 1 0 a 0 0 0 0 0 0 0 0 
+        % 5
+        ; 0 0 0 0 0 0 0 -1 -a 0 0 1 a 0 0 0 0
+        ; 0 0 0 0 0 0 0  0  a 0 1 0 a 0 0 0 0
+        % 6
+        ; 0 0 0 0 0 0 0  0 0 -1 0 0 0 1 0 0 0
+        ; 0 0 0 0 0 0 0  0 0  0 1 0 0 0 0 0 0
+        %  7
+        ; 0 0 0 0 0 0 0  0 0 0 0 -1 0 0 0 a 0
+        ; 0 0 0 0 0 0 0  0 0 0 0  0 0 0 1 a 0
+        % 8
+        ; 0 0 0 0 0 0 0 0 0 0 0  0 a 1 0 0 -1
+        ; 0 0 0 0 0 0 0 0 0 0 0  0 a 0 1 0  0
+        % 9 and 10
+        ; 0 0 0 0 0 0 0 0 0 0 0  0 0 0 0 a 1
+        ]);
+>> b = @(F) sparse([0 0 0 F(1) 0 0 0 F(2) 0 0 0 F(3) 0 0 0 F(4) 0])';
+>> b([10 15 0 10]);
+>> A\ans
+ans =
+   (1,1)    -26.870057685088803
+   (2,1)     19.000000000000000
+   (3,1)     10.000000000000000
+   (4,1)    -27.999999999999996
+   (5,1)     12.727922061357855
+   (6,1)     19.000000000000000
+   (8,1)    -27.999999999999996
+   (9,1)      8.485281374238570
+  (10,1)     22.000000000000000
+  (12,1)    -16.000000000000000
+  (13,1)     -8.485281374238570
+  (14,1)     22.000000000000000
+  (15,1)     16.000000000000000
+  (16,1)    -22.627416997969519
+  (17,1)     16.000000000000000
+\end{minted}
+\textbf{(b).}
+\begin{minted}{matlab}
+>> b([15 0 0 10]);
+>> A\ans
+ans =
+   (1,1)    -19.798989873223331
+   (2,1)     13.999999999999996
+   (3,1)     15.000000000000000
+   (4,1)    -13.000000000000000
+   (5,1)     -1.414213562373094
+   (6,1)     13.999999999999996
+   (8,1)    -13.000000000000000
+   (9,1)      1.414213562373094
+  (10,1)     11.999999999999998
+  (12,1)    -11.000000000000000
+  (13,1)     -1.414213562373094
+  (14,1)     11.999999999999998
+  (15,1)     11.000000000000000
+  (16,1)    -15.556349186104045
+  (17,1)     11.000000000000000
+\end{minted}
+\textbf{(c).}
+\begin{minted}{matlab}
+>> b([10 0 20 0]);
+>> A\ans
+ans =
+   (1,1)    -22.627416997969522
+   (2,1)     15.999999999999995
+   (3,1)     10.000000000000000
+   (4,1)    -22.000000000000004
+   (5,1)      8.485281374238571
+   (6,1)     15.999999999999995
+   (8,1)    -21.999999999999996
+   (9,1)     -8.485281374238573
+  (10,1)     28.000000000000000
+  (11,1)     20.000000000000000
+  (12,1)    -14.000000000000000
+  (13,1)    -19.798989873223327
+  (14,1)     28.000000000000000
+  (15,1)     14.000000000000000
+  (16,1)    -19.798989873223327
+  (17,1)     14.000000000000000
+\end{minted}
+\textbf{(d).}
+\begin{minted}{matlab}
+>> b([0 10 10 0]);
+>> A\ans
+ans =
+   (1,1)    -14.142135623730953
+   (2,1)     10.000000000000000
+   (4,1)    -20.000000000000004
+   (5,1)     14.142135623730951
+   (6,1)     10.000000000000000
+   (8,1)    -20.000000000000000
+  (10,1)     20.000000000000000
+  (11,1)     10.000000000000000
+  (12,1)    -10.000000000000000
+  (13,1)    -14.142135623730949
+  (14,1)     20.000000000000000
+  (15,1)     10.000000000000000
+  (16,1)    -14.142135623730949
+  (17,1)     10.000000000000000
+\end{minted}
+\newpage
+\subsection{The Secant Method in Matlab}
+\textbf{The pseudo code is based on the slide chap6-1 from page 5 to 6}
+From the x matrix formulae we get following equation,we have two part:\\
+forward elimination($i<\frac{n+1}{2}$):
+\begin{align*}
+    d_1*x_1+a_n*x_n=b_1\\
+... \\
+d_i*x_i+a_{n-i+1}*x_{n-i+1}=b_i
+\end{align*}
+Backward elimination:
+\begin{align*}
+    a_1*x_1+d_n*x_n=b_n\\
+    ...\\
+    a_i*x_i+d_{n-i+1}*x_{n-i+1}=b_{n-i+1}
+\end{align*}
+\begin{minted}{matlab}
+function x=GaussianX(n,d,a,b)
+  % function x=GaussianX(n,d,a,b)
+  % input: n: system size, must be odd
+  %        (d,a,b): vectors of length n
+  % output: x=solution
+  x=sparse(zeros(1,9));
+  i = (n + 1) / 2;
+  x(i) = b(i) / d(i);
+
+   0.459697694130825
+
+\textbf{What to hand in:}  the source code for the functions, as well as the script file for using the functions.
+You should also turn in the output results from Matlab. 
+
+\section*{}
+\setcounter{section}{8}
+\subsection{Fitting a Constant Function Using Least Squares}
+Use the method of least squares, find the constant function f(x) = C that best fits the
+data.\\
+For the error function, they all similar like:
+\[\varphi(a,b)=\sum_{i=0}^m (f(x)-y_i)^2=\sum_{i=0}^m (ax_i+b-y_i)^2 \]
+\textbf{(a) Data set 1:} 
+From the slides we know and questions we know at minimum, we have:
+\[ \varphi(c) '=2(3c-\left(\frac{5}{4}+\frac{4}{3}+\frac{5}{12}\right))=6c-6=0
+\]So we get the answer that $c=1$, therefore, the best fitting constant function $f(x)=1$.
+\\
+\textbf{(b).Data set 2:}
+\[ \varphi(c) '=2(3c-(1.4+1.5+1.4))=6c-8.6=0
+\]
+So we get the answer that $c=1.4333$, therefore, the best fitting constant function $f(x)=1.4333$.\\
+\textbf{(C).Given a general data set $(x_k,y_k)$ for $k = 0,1,··· ,m$, find the constant function
+$f(x) = C$ that best fit the data. Derive the formula for C. Does the formula depend on
+the points $x_k$? Are you surprised with the formula?}
+\[ \varphi(c) '=2\sum_{i=0}^m(c-y_i)=0\implies c(m+1)=\sum_{i=0}^m y_i\implies c=\frac{\sum_{i=0}^m y_i}{m+1}
+\]
+
+Note that these are sample problems for the purpose of learning latex. They are NOT the actual problems.
+\bigskip
+
+    0.8299
+    0.6737
+    0.5273
+    0.3864
+    0.2482
+    0.1092
+   -0.0331
+   -0.1823
+   -0.3414
+
+   1.000000000000031
+   0.999999999999925
+   1.000000000000065
+   0.999999999999977
+   1.000000000000003
+\end{minted}
+
+    0.8291
+    0.6725
+    0.5255
+    0.3845
+    0.2461
+    0.1073
+   -0.0348
+   -0.1835
+   -0.3421
+
+\section*{}
+\setcounter{section}{11}
+\subsection{FDM for Elliptic Problems in 2D} 
+\textbf{(a).}Based on the slides we know:\\
+$\frac{u_{i-1,j}-2u_{i,j}+u_{i+1,j}}{h^2}+\frac{u_{i,j-1}-2u_{i,j}+u_{i,j+1}}{h^2}=1$
+\\$4u_{i,j}+h^2=u_{i-1,j}+u_{i+1,j}+u{i,j-1}+u_{i,j+1}$\\
+$4u_{i,j}-u_{i-1,j}-u_{i+1,j}-u_{i,j-1}-u_{i,j+1}=-\frac{1}{25}$
+\[\begin{aligned}
+u_{0,j}=0,u_{5,j}=j,u_{i,0}=0,u_{i,5}=i,\quad i\in\{0,1,2,3,4,5\},j\in\{0,1,2,3,4,5\}\\
+% i=1,j=1:4u_{1,1}-0-u_{2,1}-0-u_{1,2}=-\frac{1}{25}\\
+% i=2,j=1:4u_{2,1}-u_{1,1}-u_{3,1}-0-u_{2,2}=-\frac{1}{25}\\
+% i=3,j=1:4u_{3,1}-u_{2,1}-u_{4,1}-0-u_{3,2}=-\frac{1}{25}\\
+% i=4,j=1:4u_{4,1}-u_{3,1}-1-0-u_{4,2}=-\frac{1}{25}\\
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+u_{1,1}=v_1,u_{1,2}=v_2,u_{1,3}=v_3,u_{1,4}=v_4,\\
+u_{2,1}=v_5,u_{2,2}=v_6,u_{2,3}=v_7,u_{2,4}=v_8,\\
+u_{3,1}=v_9,u_{3,2}=v_10,u_{3,3}=v_11,u_{3,4}=v_12,\\
+u_{4,1}=v_13,u_{4,2}=v_14,u_{4,3}=v_15,u_{4,4}=v_16,\\
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+i=1,j=1:4u_{1,1}-0-u_{2,1}-0-u_{1,2}=-\frac{1}{25}\\
+i=1,j=2:4u_{1,2}-0-u_{2,2}-u_{1,1}-u_{1,3}=-\frac{1}{25}\\
+i=1,j=3:4u_{1,3}-0-u_{2,3}-u_{1,2}-u_{1,4}=-\frac{1}{25}\\
+i=1,j=4:4u_{1,4}-0-u_{2,4}-u_{1,3}-1=-\frac{1}{25}\\
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+i=2,j=1:4u_{2,1}-u_{1,1}-u_{3,1}-0-u_{2,2}=-\frac{1}{25}\\
+i=2,j=2:4u_{2,2}-u_{1,2}-u_{3,2}-u_{2,1}-u_{2,3}=-\frac{1}{25}\\
+i=2,j=3:4u_{2,3}-u_{1,3}-u_{3,3}-u_{2,2}-u_{2,4}=-\frac{1}{25}\\
+i=2,j=4:4u_{2,4}-u_{1,4}-u_{3,4}-u_{2,3}-2=-\frac{1}{25}\\
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+i=3,j=1:4u_{3,1}-u_{2,1}-u_{4,1}-0-u_{3,2}=-\frac{1}{25}\\
+i=3,j=2:4u_{3,2}-u_{2,2}-u_{4,2}-u_{3,1}-u_{3,3}=-\frac{1}{25}\\
+i=3,j=3:4u_{3,3}-u_{2,3}-u_{4,3}-u_{3,2}-u_{3,4}=-\frac{1}{25}\\
+i=3,j=4:4u_{3,4}-u_{2,4}-u_{4,4}-u_{3,3}-3=-\frac{1}{25}\\
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+i=4,j=1:4u_{4,1}-u_{3,1}-1-0-u_{4,2}=-\frac{1}{25}\\
+i=4,j=2:4u_{4,2}-u_{3,2}-2-u_{4,1}-u_{4,3}=-\frac{1}{25}\\
+i=4,j=3:4u_{4,3}-u_{3,3}-3-u_{4,2}-u_{4,4}=-\frac{1}{25}\\
+i=4,j=4:4u_{4,4}-u_{3,4}-4-u_{4,3}-4=-\frac{1}{25}\\
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+4v_1-v_5-v_2=-\frac{1}{25}\\
+4v_2-v_6-v_1-v_3=-\frac{1}{25}\\
+4v_3-v_7-v_2-v_4=-\frac{1}{25}\\
+4v_4-v_8-v_3=1-\frac{1}{25}\\
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+4v_5-v_1-v_9-v_6=-\frac{1}{25}\\
+4v_6-v_2-v_10-v_5-v_7=-\frac{1}{25}\\
+4v_7-v_3-v_11-v_6-v_8=-\frac{1}{25}\\
+4v_8-v_4-v_12-v_7=2-\frac{1}{25}\\
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+4v_9-v_5-v_13-v_10=-\frac{1}{25}\\
+4v_10-v_6-v_14-v_9-v_11=-\frac{1}{25}\\
+4v_11-v_7-v_15-v_10-v_12=-\frac{1}{25}\\
+4v_12-v_8-v_16-v_11=3-\frac{1}{25}\\
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+4v_13-v_9-v_1-v_14=-\frac{1}{25}\\
+4v_14-v_10-v_2-v_15=-\frac{1}{25}\\
+4v_15-v_11-v_3-v_16=-\frac{1}{25}\\
+4v_16-v_12-v_4-v_15=4-\frac{1}{25}\\
+\end{aligned}\]Then we could solve it as $A*v=b$
+\newpage
+\subsection{Heat equation}
+\textbf{(a).}Based on the equation 11.3.4 from the book. we getForward-Euler method::
+\[\begin{aligned}
+u_j^{n+1}=4\gamma u_{j-1}^n+(1-8\gamma)u_j^n+4\gamma u_{j+1}^n+\Delta t(where:\gamma=\frac{\Delta t}{\Delta x^2})\\
+u_j^0=f(x_j)=0,u_0^n=0,u_M^n=0,j=0,1,2,3,...,M,n\geq 0.
+\end{aligned}\]
+\textbf{(b).}
+\[\begin{aligned}
+  u_t(t_{n+1},x_j)\approx \frac{u_j^{n+1}-u_j^n}{\Delta t}\implies\\
+  \frac{u_j^{n+1}-u_j^n}{\Delta t}=\frac{4\gamma u_{j-1}^{n+1}-8\gamma u_j^{n+1}+4\gamma u_{j+1}^{n+1}}{\Delta x^2}+1\\
+  \implies u_j^n=-4\gamma u_{j-1}^{n+1}+(1+8\gamma) u_j^{n+1}-4\gamma u_{j+1}^{n+1}-\Delta t(where:\gamma=\frac{\Delta t}{\Delta x^2})
+\end{aligned}\]We could use this equation to solve the heat equation by using the tri-diagonal matrix with unknow vector.
+Each row of the matrix is the equation of the heat equation would like this:
+\[\begin{aligned}
+  -u_j^n-4\gamma u_{j-1}^{n+1}+(1+8\gamma) u_j^{n+1}-4\gamma u_{j+1}^{n+1}=\Delta t
+\end{aligned}\]
+\newpage
+\subsection{Laplace Equation in 2D}
+Since $h=0.25\frac{1}{N}=\frac{1}{4}\implies N=4$
+$\frac{2u_{i-1,j}-4u_{i,j}+2u_{i+1,j}}{h^2}+\frac{u_{i,j-1}-2u_{i,j}+u_{i,j+1}}{h^2}=0$
+\[\begin{aligned}
+  u(i,0)=0,u(i,4)=0,u(0,j)=sin(\pi j),u(4,j)=0,j=0,1,2,3,4,i=0,1,2,3,4,\\
+  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+  2u_{i-1,j}-6u_{i,j}+2u_{i+1,j}+u_{i,j-1}+u_{i,j+1}=0\\
+  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+  i=1,j=1:2sin(1\pi )-6u_{1,1}+2u_{2,1}+0+u_{1,2}=0\\
+  i=1,j=2:2sin(2\pi )-6u_{1,2}+2u_{2,2}+u_{1,1}+u_{1,3}=0\\
+  i=1,j=3:2sin(3\pi )-6u_{1,3}+2u_{2,3}+u_{1,2}+0=0\\
+  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+  i=2,j=1:2u_{1,1}-6u_{2,1}+2u_{3,1}+0+u_{2,2}=0\\
+  i=2,j=2:2u_{1,2}-6u_{2,2}+2u_{3,2}+u_{2,1}+u_{2,3}=0\\
+  i=2,j=3:2u_{1,3}-6u_{2,3}+2u_{3,3}+u_{2,2}+0=0\\
+  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+  i=3,j=1:2u_{2,1}-6u_{3,1}+0+0+u_{3,2}=0\\
+  i=3,j=2:2u_{2,2}-6u_{3,2}+0+u_{3,1}+u_{3,3}=0\\
+  i=3,j=3:2u_{2,3}-6u_{3,3}+0+u_{3,2}+0=0\\
+  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+  u_{1,1}=v_1,u_{1,2}=v_2,u_{1,3}=v_3,\\
+  u_{2,1}=v_4,u_{2,2}=v_5,u_{2,3}=v_6,\\
+  u_{3,1}=v_7,u_{3,2}=v_8,u_{3,3}=v_9,\\
+  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+  2sin(1\pi )-6v_1+2v_4+v_2=0,\\
+  2sin(2\pi )-6v_2+2v_5+v_1+v_3=0,\\
+  2sin(3\pi )-6v_3+2v_6+v_2=0,\\
+  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+  2v_1-6v_4+2v_7+v_5=0,\\
+  2v_2-6v_5+2v_8+v_4+v_6=0,\\
+  2v_3-6v_6+2v_9+v_5=0,\\
+  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+  2v_4-6v_7+v_8=0,\\
+  2v_5-6v_8+v_7+v_9=0,\\
+  2v_6-6v_9+v_8=0,\\
+\end{aligned}\]Then we could solve it by using the tri-diagonal matrix with unknow vector.$Av=b$
+\newpage
+\subsection{Explicit and implicit methods for heat equation}
+\textbf{(a).}Based on the equation 11.3.4 from the book. we getForward-Euler method::
+\[\begin{aligned}
+u_j^{n+1}=2\gamma u_{j-1}^n+(1-4\gamma)u_j^n+2\gamma u_{j+1}^n(where:\gamma=\frac{\Delta t}{\Delta x^2})\\
+u_j^0=f(x_j)=x_j(4-x_j),u_0^n=0,u_M^n=0,j=0,1,2,3,...,M=4,n\geq 0.
+\end{aligned}\]
+\textbf{(b).}The exact solution u(t,x) of the heat equation satisfies the following maximun principle:
+\[\begin{aligned}
+  \\Delta x=\frac{1}{M},x_j=j\Delta x,j=0,1,2,...,M.t_0=0,t_n=n\Delta t,n=0,1,2...\\
+  min_{y\in[0,1]}u(t_1,y)\leq u(t_2,x)\leq max_{y\in[0,1]}u(t_1,y)(1)\\
+  \text{For any }t2\geq t_1.\text{In particular,(1)implies}\\
+  max_{x\in[0,1]}|u(t_2,x)\leq man_{x\in[0,1]}u(t_1,x)(2)\\
+  \text{For any }t_2\geq t_1\implies \text{The maximun vlue of |u(t,x)| over is non-increasing in time t.}\\
+  \textbf{Discrete Maximum principle. for our approximate solution}\\
+  max_j|u_j^{n+1}|\leq max_{j}|u_j^n|,\text{for every n.}(3)\\
+  \text{We now provide a sufficient condition for (3) base on our questions.}\\
+  1-4\gamma\geq 0\implies \gamma\leq\frac{1}{4}\implies\Delta t\leq \frac{1}{4}\Delta x^2.(4)\\
+  Then:\\
+  |u_j^{n+1}|\leq \gamma max_i|u_{j-1}^n|+(1-4\gamma)|u_j^n|+\gamma|u_{j+1}^n|\\
+  \leq \gamma max_i|u_{i}^n|+(1-4\gamma)max_i|u_i^n|+\gamma max_i|u_i^n|\\
+  =max_i|u_i^n|\\
+  \text{This means}\\
+  |u_j^{n+1}|\leq max_i|u_i^n|\text{for every j.}\\
+  \text{Since this holds for all j, we conclude that}\\
+  max_j|u_j^{n+1}|\leq max_j|u_j^n|\text{for every n.}\\
+  \Delta t\leq\frac{1}{4}\Delta x^2\\
+  \text{If }\Delta x=10^-5,\text{then the time step size }\\
+  \Delta t\text{must be }\Delta t\leq \frac{1}{4}10^{-10}=0.00001.\\
+  \text{which is extremely small.}\\
+\end{aligned}\]
+\end{document}
+
+Let the function $f(x) $ be smooth. Consider the finite difference approximation formula
+\begin{equation}\label{p4for}
+f'(x)~\approx~ D_h(x)~=~\frac{1}{2h} [ -3f(x)+4f(x+h)-f(x+2h)]\,.
+\end{equation}
+Note that this scheme uses values of $f$ at the  three points $x, x+h, x+2h$.
+This is a one-sided finite difference.
+
+    0.8293
+    0.6728
+    0.5258
+    0.3848
+    0.2464
+    0.1076
+   -0.0346
+   -0.1834
+   -0.3420
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Sharpening Your Matlab Skills} 
+Write a {\ttfamily{function}}  for summing all the elements in a
+matrix $A$, namely, 
+\[V=\displaystyle\sum_{i=1}^n\sum_{j=1}^nA_{ij}.\]
+({\it Hint:} Use the build-in function {\ttfamily size} to obtain
+ the dimensions of a matrix.) You may call the function \texttt{MatSum}. 
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%
+%\subsection*{Problem 6: Matlab Exercises}
+\subsection{Matlab Exercises}
+
+>> x=A\b
+Warning: Matrix is close to singular or badly scaled. Results may be inaccurate.
+RCOND =  5.882890e-18. 
+ 
+
+\title{ Homework 11}
+\author{}
+
+Read through the Chapter ``Introduction'' and ``Simple calculations and graphs". 
+
+    19
+    >> [x, nit] = sor(A, b, x0, 1.6, 4, 1e-4, 100)
+
+ans =
+
+>> 
+\end{minted}
+My answer is close to the given answer
+\end{document}
+
+\title{ Homework 5}
+\author{}
+
+   2.0000e+00            0            0            0            0
+            0   9.4395e-02            0            0            0
+            0            0   1.4293e-03            0            0
+            0            0            0   5.5536e-06            0
+            0            0            0            0   1.8111e-09
+\end{minted}
+\textbf{(ii).}
+\begin{minted}{matlab}
+function fr=frn(x)
+    fr=sqrt(x);
+end
+>> R=romberg('frn',0,1,5)
+
+   0.999999999999612
+   1.000000000000889
+   0.999999999999494
+   1.000000000000104
+   0.999999999999993
+
+\section*{}
+\setcounter{section}{7}
+\subsection{Comparing various methods}
+Solve the linear system with the four methods below (Do not use Matlab).
+\[
+\left[ 
+\begin{array}{ccc}
+  4 &  3 &  0\\
+  3 &  4 & -1\\
+  0 & -1 &  4
+\end{array}
+\right] \times
+\begin{array}{c}
+     x_1  \\
+     x_2  \\
+     x_3
+\end{array}=
+\begin{array}{c}
+     24  \\
+     30 \\
+     -24 
+\end{array}
+\]
+\textbf{(a).Gaussian elimination (tridiagonal system).} 
+Forward Elimination:
+\[
+\left[ 
+\begin{array}{ccc}
+  4 &  3 &  0\\
+  3 &  1.75 & -1\\
+  0 & -1 &  3.4286
+\end{array}
+\right] \times
+\begin{array}{c}
+     x_1  \\
+     x_2  \\
+     x_3
+\end{array}=
+\begin{array}{c}
+     24  \\
+     12 \\
+     -17.1429 
+\end{array}
+\]
+step2: Backward substitution:
+\[\left[\begin{array}{c}
+     x_1  \\
+     x_2  \\
+     x_3
+\end{array}\right]=
+\begin{array}{c}
+     3  \\
+     4 \\
+     -5 
+\end{array}\]
+\textbf{(b).Jacobi’s method.}
+I just re-write the equation from slide chap7-1 page 4 like that:
+\[x_i^{k+1}=\frac{b_i+a_{ii}x_i^k-\sum^n_{j=1}{a_{ij}x_j^k}}{a_{ii}}\]
+Then we get the 2 iterations:
+\[{\vec x}^1=[0.375,1.5,-4.125]   \]
+\[{\vec x}^2=[4.875,6.1875,-5.625]\]
+\textbf{(c).Gauss-Seidel’s method.}
+Then we get the 2 iterations:
+\[{\vec x}^1=[0.375,5.7188, -4.5703]   \]
+\[{\vec x}^2=[1.7109, 5.0742, -4.7314]\]
+\textbf{(d).The SOR-method, with w = 1.25.}
+Then we get the 2 iterations:
+\[{\vec x}^1=[-1.0312, 6.5918, -3.9401]   \]
+\[{\vec x}^2=[1.5780, 5.0164, -4.9474]\]
+From we do 2 iterations for each method, I think SOR-method work better for this example.
+\newpage
+\subsection{More practice on various methods}
+Perform one step Jacobi iteration, using x0 = y0 = z0 = 1 as starting value.:
+\[x_1=0, y_1=1.375,z_1=-0.4286\]
+Perform one step Gauss-Seidel iteration, using x0 = y0 = z0 = 1 as starting value.
+\[x_1=5.25, y_1=3.8125, z_1=-5.0469\]
+Do Jacobi iterations converge for this system? Do Gauss-Seidel iterations converge
+for this system? Why?\\
+Analysis for errors and convergence:
+Jacobi:
+\[M_J=-D^{-1}(L+U)=\left[
+\begin{array}{ccc}
+  -2    & -0.75 & 0\\
+  -0.75 &   -2  & 0.25\\
+  0     & 0.25  & -2
+\end{array}\right]=2.79>1\]
+Hence the jacobi method not converge.
+Gauss-Seidel:
+\[M_{GS}=-{(D+L)}^{-1}U=\left[
+\begin{array}{ccc}
+  0.5    & 0.375   &    0 \\
+  -0.188  & 0.36  & -0.125 \\
+  -0.023  & 0.045  &  0.4844
+\end{array}\right]=0.6312>1\]
+Hence the Gauss-Seidel method converge.
+\newpage
+\subsection{SOR in Matlab}
+\textbf{(a).}
+\begin{minted}{matlab}
+function [x,nit]=sor(A,b,x0,w,d,tol,nmax)
+% SOR : solve linear system with SOR iteration
+% Usage: [x,nit]=sor(A,b,x0,omega,d,tol,nmax)
+% Inputs:
+% A : an n x n-matrix,
+% b : the rhs vector, with length n
+% x0 : the start vector for the iteration
+% tol: error tolerance
+% w: relaxation parameter, (1 < w < 2),
+% d : band width of A.
+% Outputs::
+% x : the solution vector
+% nit: number of iterations
+    x=x0;
+    n=length(x);
+    nit=0;
+    while nit< nmax && norm (A*x-b)>tol
+        for i=1:n
+            aii=A(i,i);
+            eq1=sum(A(i,1:i-1)' .*x(1:i-1));
+            eq2=sum(A(i,i+1:n)'*x(i+1:n));
+            equ=eq1+eq2;
+            equu=(b(i)-equ)/aii;
+            x(i)=(1-w)*x(i)+w*equu;
+        end
+        nit=nit+1;
+    end
+end
+\end{minted}
+\textbf{(b).Use your function sor to solve the following tridiagonal system, with}
+\begin{minted}{matlab}
+>>  A = diag(-2.011:-0.001:-2.019);
+>> for i = 1:length(A)-1
+ A(i+1,i)=1;
+ A(i,i+1)=1;
+end;
+>> b=[-0.994974 1.57407e-3 -8.96677e-4 -2.71137e-3 -4.07407e-3 -5.11719e-3 -5.92917e-3 -6.57065e-3 0.507084]';
+>> x0 = [0.95:-0.05:0.55]';
+>> [x, nit] = sor(A, b, x0, 1, 4, 1e-4, 100)
+x =
+
+\textbf{case(ii)}
+\begin{minted}{matlab}
+>> c=[0.1:0.1:1];
+>> A=vander(c);
+>> b=A*ones(size(c'));
+>> x=naiv_gauss(A,b)
+
+   0.998774840610394
+   1.005853289548497
+   0.988068244628706
+   1.013568750263305
+   0.990551321010233
+   1.004157217864660
+   0.998851916215852
+   1.000190204544961
+   0.999983061158011
+   1.000000606254654
+
+\begin{align*}
+    S(f;0.2)&=\frac{h}{3}\times [f_0+4\times (f_1+f_3)+2\times f_2+f_4]\\
+    &=0.550676
+\end{align*}
+\newpage
+\textbf{(c).} The exact value is 
+$\int _0^{0.8}\:e^{-x}dx=0.55068$. The absolute error by using
+trapezoid rule is $\frac{0.8-0}{12}\times h^2 \times e^0=0.002667$ and Simpson’s rule is $\frac{0.8}{180}\times h^4 \times e^0=0.000007$. Simpson’s rule is better.
+\newpage
+\textbf{(d).}trapezoid rule:
+\[\begin{aligned}
+    &|E_T(f;h)|\leq \frac{0.8-0}{12}\times h^2 \times e^0 \leq 10^{-4} \\
+    &\implies h^2 \leq \frac{12}{0.8}\times 10^{-4} =0.0015\\
+    & \implies \frac{0.8}{n}= h \leq 0.0387298\\
+    & \implies n \geq \frac{0.8}{0.0387298}=20.6559
+\end{aligned}\]
+So, the error for trapezoid rule will have at least 21 points.\\
+Simpson's rule:
+\[\begin{aligned}
+    &|E_S(f;h)|\leq \frac{0.8-0}{180}\times h^4 \times e^0 \leq 10^{-4} \\
+    &\implies h^4 \leq \frac{180}{0.8}\times 10^{-4} =0.0225\\
+    & \implies \frac{0.8}{2n}= h \leq 0.387298\\
+    & \implies n \geq \frac{0.8}{2\times0.0387298}=10.3280\\
+    & \implies 2n+1= 21.6560
+\end{aligned}\]
+So, the error for Simpson's rule will have at least 22 points.
+\newpage
+\subsection{Simpson’s rule.}
+$\int _0^1 f(x)dx$ with data set:\\
+\[\begin{array}{c||c|c|c|c|c}
+     x& 0.00&0.25&0.50&0.75&1.00 \\ \hline
+     f(x)& 0.00&0.06&0.24&0.51&0.84
+\end{array}\]
+\textbf{(a).} h=0.25
+\begin{align*}
+    S(f;0.25)&=\frac{h}{3}\times [f_0+4\times (f_1+f_3)+2\times f_2+f_4]\\
+    &=0.3
+\end{align*}
+
+   0.666666661578071
+
+\title{ Homework 6}
+\author{}
+
+   100
+\end{minted}
+After 100 iterations, it's not reach the required results. It is much slower than the SOR method.
+\newpage
+\subsection{SOR with Jacobi iterations}
+\textbf{(a).Design an SOR method based on Jacobi iteration.}
+\[x_i^{k+1}=(1-\omega)x_i^k+\omega\times\frac{b_i+a_{ii}x_i^k-\sum^n_{j=1}{a_{ij}x_j^k}}{a_{ii}}\]
+We get \[\frac{b_i+a_{ii}x_i^k-\sum^n_{j=1}{a_{ij}x_j^k}}{a_{ii}}\] From question7.1(b)\\
+\textbf{(b).}
+\[x^{k+1}=(1-\omega)\times x^k+\omega\times \frac{b-(U+L)\times x^k}{D}\]
+We get this equation based on the Chap7.1 page3, Chap7.6 page 5, and equation from 7.5(a).
+\end{document}
+
+Specifically, 
+let $fl(x)=x(1+\delta_x)$ and $fl(y)=y(1+\delta_y)$ 
+where $fl(x)$ is the floating point representation of $x$. 
+Find the expression for the absolute error and the relative error in the answer $fl(z)$.
+
+   0.550671035882778
+
+    1.5708
+\end{minted}
+The answer is strange. It shouldn't have answer for this equation when the is between 1 and 2. Check the graph of tan(x)-x on[1,2]
+\begin{center}
+\includegraphics[width=0.08\textwidth]{5_1c.png}
+\end{center}
+\newpage
+\textbf{(d).}
+\begin{minted}{matlab}
+f= @(x) x^3-2*x+1-x^2;
+>> a=0;
+>> b=0.5;
+>> r=bisection(f,a,b,tol,nmax);
+>> r
+
+\begin{document}
+
+    0.8294
+    0.6728
+    0.5259
+    0.3849
+    0.2465
+    0.1077
+   -0.0345
+   -0.1833
+   -0.3419
+
+    28
+    >> [x, nit] = sor(A, b, x0, 1.5, 4, 1e-4, 100)
+
+Find a computer with Matlab installed in it.  Start Matlab, by either
+clicking on the appropriate icon(Windows or Mac), or by typing in {\tt matlab}
+(unix or linux). You should get a command window on the screen.
+
+>> 
+The exact value for the integration is: 
+>> -exp(-0.8)-(-exp(0.0))
+
+\title{ Homework 9}
+\author{}
+
+nit =
+
+    0.8292
+    0.6726
+    0.5255
+    0.3845
+    0.2461
+    0.1073
+   -0.0348
+   -0.1835
+   -0.3421
+
+\subsection{Finite Difference, Taylor Series and Local Truncation Error}
+
+    0.8294
+    0.6728
+    0.5259
+    0.3849
+    0.2465
+    0.1077
+   -0.0346
+   -0.1833
+   -0.3420
+
+\hspace*{1cm}{\tt lookfor} keyword:  Look after the ``keyword''  among
+Matlab functions.
+
+\title{ Homework 10}
+\author{}
+
+\end{minted}
+Root not found when interval between 0 and 1.
+\begin{minted}{matlab}
+>> f = @(x) 9*x^4 +18*x^3 + 38*x^2 -57*x +14;
+>> a=0;
+>> b=0.5;
+>> tol=1e-6;
+>> nmax=100;
+>> r=bisection(f,a,b,tol,nmax);
+>> r
+
+   0.550672828430556
+
+   0.550699716367144
+
+\title{ Homework 8}
+\author{}
+
+>> y=r*r
+
+\section*{}
+\setcounter{section}{4}
+\subsection{Trapezoid and Simpson’s Methods}
+\[\begin{array}{c|c|c}
+    i & x_i &f_i  \\ \hline
+    0 & 0.0 & 1 \\
+    1 & 0.2 & 0.818731 \\
+    2 & 0.4 & 0.670320 \\
+    3 & 0.6 & 0.548812 \\
+    4 & 0.8 & 0.449329 
+\end{array}\]
+\textbf{(a).} $f(x)=e^{-x}$ We can set up the data, here $h=\frac{0.8}{4}=0.2$ By the formula, we get
+$T=0.2[\frac{f_0+f_4}{2}+\sum_{i=1}^3 f_i]=0.552506$
+\newpage
+\textbf{(b).}Here $h=\frac{0.8}{4}=0.2.$
+
+\begin{document}
+\maketitle
+\tableofcontents
+
+To get started, you can read the first two chapters  in ``{\it A Practical Introduction to Matlab}'' by
+Gockenbach. 
+You can find the introduction at the web-page: 
+
+   0.100260367617011
+  -0.547611736692488
+   1.322086302655506
+  -1.861303854966565
+   1.697314314649383
+  -1.052455338465164
+   0.452613654373408
+  -0.134745815870952
+   0.027010370505822
+  -0.003364454050715
+   0.000193583684468
+   0.000007778825174
+  -0.000002060199317
+   0.000000130012968
+  -0.000000003878228
+   0.000000000134212
+  -0.000000000006845
+   0.000000000000244
+  -0.000000000000009
+   0.000000000000001
+
+>> quadl('frn',0,1,1e-9)
+
+   2.828427124746190
+   3.137144123001518
+   3.141456439650717
+   3.141589746000712
+   3.141592622248856
+   3.141592653444242
+   3.141592653589529
+   3.141592653589790
+   3.141592653589795
+   3.141592653589796
+   3.141592653589786
+   3.141592653589791
+   3.141592653589786
+   3.141592653589790
+   3.141592653589778
+\end{minted}
+\newpage
+\subsection{Numerical Integration and Extrapolation}
+\textbf{(a).} From the slide we know the equation of trapezoid rule is :\\
+$T(f,h)=h\times [\frac{1}{2}\times(f(x_0)+f(x_n))+\sum_{i=1}^{n-1} f(x_i)] \text{ and }h=\frac{b-a}{n}=\frac{1}{n}$ \\When n=1,3,9 we get diff values. I deiced to use matlab to compute it. 
+\begin{minted}{matlab}
+%when n = 1
+>> v=trapezoid('funItg47', 0, 1, 1)
+
+    'r not found'
+
+y =
+
+% converting numbers b/t bases
+\subsection{Error Propagation}\index{error propagation}
+Perform a detailed study for the error propagation
+for the following computations:
+\begin{itemize}
+\item[(A)] $z=xy$
+\item[(B)] $z=5x+7y$
+\end{itemize}
+
+    0.8293
+    0.6728
+    0.5259
+    0.3848
+    0.2464
+    0.1076
+   -0.0346
+   -0.1833
+   -0.3420
+
+   0.550785754235408
+
+x =
+
+    67
+>> [x, nit] = sor(A, b, x0, 1.1, 4, 1e-4, 100)
+
+   9.2074e-01
+ %when n=3
+ >> v=trapezoid('funItg47', 0, 1, 3)
+
+Using Taylor series, show that the local truncation error  is bounded by $C h^2$
+for some constant $C$, i.e.
+$$ \abs{f'(x) - D_h(x)} \le C h^2.$$
+
+     3.302503233730415e-04
+
+\documentclass[11pt]{article}
+
+\newpage
+
+\usepackage{amsmath}
+
+\usepackage{amsmath}
+\usepackage{graphicx}
+\usepackage{minted}
+\usepackage{braket}
+
+\paragraph*{Help!} \mbox{} \\
+As we will see later, Matlab has many build-in numerical functions.
+One of them is a function that does polynomial interpolation. 
+But what is the name, and how to use it? 
+You can use {\tt lookfor} to find the function,
+and {\tt help} to get a description on how to use it. 
+
+    20
+    >> [x, nit] = sor(A, b, x0, 1.7, 4, 1e-4, 100)
+
+   0.550678206059886
+
+\section*{Sample LaTeX File for Some Homework Problems}
+\setcounter{section}{1}
+
+>> diag(abs(diag(R-quad('frn',0,1))))
+
+v =
+
+   1.000000000012049
+   0.999999999936912
+   1.000000000142096
+   0.999999999820241
+   1.000000000139617
+   0.999999999931755
+   1.000000000020688
+   0.999999999996307
+   1.000000000000348
+   0.999999999999987
+\end{minted}
+\textbf{Case(iii.)}
+\begin{minted}{matlab}
+>> c=[0.05:0.05:1];
+>> A=vander(c);
+>> b=A*ones(size(c'));
+>> x=naiv_gauss(A,b)
+
+\end{minted}
+\newpage
+\textbf{(c).}Explain why Romberg algorithm works poorly for the integral in ii).\\
+Because his exact values are infinite repeating decimals, Romberg calc finite values
+\newpage
+\textbf{(d).}
+\begin{minted}{matlab}
+%i):
+>> format long;
+>> quad('frn',0,1,1e-9)
+
+Go through the examples in Gockenbach's notes.
+
+\section*{}
+\setcounter{section}{6}
+\subsection{Basic Systems of Linear Equations.}
+\textbf{(a).} When a=0:
+\[\left\{
+\begin{array}{cc}
+    x_1+4\times x_2 &=6(1)\\
+    2\times x_1-x_2&=3(2)\\
+    3\times x_2 +x_3&=5(3)
+\end{array}
+\right.
+\]
+Then we could get the matrix A and try to get $A^{-1}$:
+\[A=\left\{
+\begin{array}{ccc|cccc}
+    1&4&0 &1&0&0&(R_1)\\
+    2&-1&0&0&1&0&(R_2) \\
+    0&3&1 &0&0&1&(R_3)
+\end{array}\right.
+\]
+$\frac{R_2-R_1*2}{-9}$ we get:
+\[\left\{
+\begin{array}{ccc|cccc}
+    1&4&0  &1&0&0&(R_1)\\
+    0&1&0& \frac{2}{9}&\frac{-1}{9}&0&(R_2) \\
+    0&3&1  &0&0&1&(R_3)
+\end{array}\right.
+\]
+Then, the final result we get $R_1-4*R_2\implies R_1$ and $R_3-3*R_2 \implies R_3$:
+\[\left\{
+\begin{array}{ccc|cccc}
+    1&0&0  &\frac{1}{9}&\frac{4}{9}&0&(R_1)\\
+    0&1&0& \frac{2}{9}&\frac{-1}{9}&0&(R_2) \\
+    0&0&1  &\frac{-2}{3}&\frac{1}{3}&1&(R_3)
+\end{array}\right.
+\]Finally, The $A^{-1}$ exist, when a=0,it has unique solution.
+\[A^{-1}=\left\{
+\begin{array}{cccc}
+    \frac{1}{9}&\frac{4}{9}&0&(R_1)\\
+    \frac{2}{9}&\frac{-1}{9}&0&(R_2) \\
+    \frac{-2}{3}&\frac{1}{3}&1&(R_3)
+\end{array}\right.
+\]
+When a=-1:
+We get:
+\[A=\left\{
+\begin{array}{ccc}
+    1&4&-1 \\
+    2&-1&-2 \\
+    -1&3&1 
+\end{array}\right.
+\]
+According calculator the determinant,$\det(A)=0$, therefore inverse matrix doesn't exist.It couldn't say there is no solution based on above. So, according to solve for the equation, the results are depending on the value of a.(a not equal +1,or-1)
+\[\left\{
+\begin{array}{cc}
+    x_1 = & \frac{2}{a+1} \\
+    x_2 = & 1 \\
+    x_3 = & \frac{2}{a+1}
+\end{array}\right. \]
+When a =1 
+\[\left\{
+\begin{array}{cc}
+    x_2 = & 1 \\
+    x_3 = & 2-x_1
+\end{array}\right. \]
+So when a=-1 we couldn't define $x_1$ and $x_3$, so there is no solution.\\
+When a = 1, the value of $x_3$ could be any value based on the value of $x_1$, so we could say it has infinitely many solutions.\\
+Also, investigate the corresponding situation when the right-hand side is replaced by
+0’s.
+\[\left\{
+\begin{array}{cc}
+    x_1+4\times x_2 +a*x_3 &=0(1)\\
+    2\times x_1-x_2 +2*a*x_3 &=0(2)\\
+    a*x_1+3\times x_2 +x_3 &=0(3)
+\end{array}
+\right.
+\]
+So we could get the solution when a is not equal +1 or -1:
+\[\left\{
+\begin{array}{cc}
+    x_1 = & 0\\
+    x_2 = & 0\\
+    x_3 = & 0
+\end{array}\right. \]
+When a = -1
+\[\left\{
+\begin{array}{cc}
+    x_2 = & 0 \\
+    x_3 = & x_1
+\end{array}\right. \]
+When a= 1
+\[\left\{
+\begin{array}{cc}
+    x_2 = & 0 \\
+    x_3 = & -x_1
+\end{array}\right. \]
+So we could say when a=0, it has a unique solution. When a=+1 or a=-1, the value of $x_3$ could be any value based the value of $x_1$, so it has infinitely many solutions.
+\newpage
+\textbf{(b).}
+\[\left\{
+\begin{array}{cc}
+     x_1+x_2=&2(1) \\
+    \beta \times x_1+x_2 =&2+\beta (2)
+\end{array}
+\right.
+\]
+we could re-write equation (1) get that $x_1=2-x_2$, put this in equation (2) we get that :
+\begin{align*}
+    2*\beta-\beta*x_2+x_2&=2+\beta\\
+    \implies x_2\times(1-\beta)&=2-\beta\\
+    \implies x_2&=\frac{2-\beta}{1-\beta}
+\end{align*}
+When $\beta =1,x_2 \text{ and } x_1 $ will be undefined, there is no solution, and naive Gaussian elimination produce erroneous answers
+for this system
+\newpage
+\subsection{Gaussian Elimination in Matlab}
+\textbf{Case(i).} 
+\begin{minted}{matlab}
+>> c=[0.2:0.2:1];
+>> A=vander(c);
+>> b=A*ones(size(c'));
+>> format long
+>> x=naiv_gauss(A,b)
+
+Therefore $f(x)=\frac{\sum_{i=0}^m y_i}{m+1}$,the formula not depend on
+the points $x_k$, I am not surprised with the formula
+\newpage
+\subsection{Fitting Functions With One Parameter with Least Squares}
+For the error function, they all similar like:
+\[\varphi(a,b)=\sum_{i=0}^m (f(x)-y_i)^2=\sum_{i=0}^m (ax_i+b-y_i)^2 \]
+\textbf{(a.)} we could re-write the 8.1(c)
+\[\varphi(c) '=\sum_{i=0}^m 2(x_i^2-x_i+c-y_i)=\sum_{i=0}^m 2(x_i^2-x_i-y_i)+2(m+1)c \implies
+c=\frac{\sum_{i=0}^m (-x_i^2+x_i+y_i)}{m+1}\]
+Here m=2 so c=$\frac{-7}{3}$=-2.333\\
+\textbf{(b).}
+We could re-write the 8.1(c) for b too:
+\[\varphi(k)'=\sum_{i=0}^m 2(k*ln\abs x-y)*ln\abs x=0 \implies \sum_{i=0}^m kln\abs{x_i}=\sum_{i=0}^m y_i\implies k(m+1)=\sum_{i=0}^m\frac{y_i}{ln\abs{x_i}}
+\]
+\[k=\frac{\sum_{i=0}^m\frac{y_i}{ln\abs{x_i}}}{m+1}\approx 0.76762\]
+\text{(since ln(1)=0,it's hard to calc with it. so i just ignore it for calc,if with it answer will be undefine)}\\
+\textbf{(C)}
+\[y=log(\beta(\abs{x}))\implies y=log(\beta)+log(\abs{x})(where C=log(\beta))\]
+I just skip the$\varphi(\varphi)$ part,it always similar
+\[\varphi '(\beta)=2\sum_{i=0}^m (C+log(\abs{x_i})-y_i)=0\implies (m+1)C=\sum_{i=0}^m (y_i-log(\abs{x_i}))\implies\]\[(log_3 (x)=5 \implies 3^5 = x)\]
+\[\implies \beta=10^{\frac{\sum_{i=0}^m (y_i-log(\abs{x_i}))}{m+1}}\approx5.50321\]
+\newpage
+\subsection{The Method of Least Squares with Polynomial Regression}
+For the error function, they all similar like:
+\[\varphi(a,b)=\sum_{i=0}^m (f(x)-y_i)^2=\sum_{i=0}^m (ax_i+b-y_i)^2 \]
+\textbf{(a).}
+set the straight line be $y=ax+b$,and $m=3$
+Use MLS:
+\[\varphi(a,b)=\sum_{i=0}^3 (f(x)-y_i)^2=\sum_{i=0}^3 (ax_i+b-y_i)^2 \]
+\[\varphi '(a)=\sum_{i=0}^3 2(ax_i+b-y_i)x_i=0 (I)\implies\]
+\[\varphi '(b)=\sum_{i=0}^3 2(ax_i+b-y_i)=0 (II)\implies\]
+\[\implies(I) a\sum_{i=0}^3 x_i^2+b\sum_{i=0}^3 x_i=\sum_{i=0}^3 x_i\times y_i\]
+\[\implies(II) a\sum_{i=0}^3 x_i+(m+1)b=\sum_{i=0}^3 y_i \]
+The sums:\[\sum_{i=0}^3 x_i^2=30 \sum_{i=0}^3 x_i=10 \sum_{i=0}^3 x_i*y_i=13 \sum_{i=0}^3 y_i=4\]The normal equations:
+\[30a+10b=13\]
+\[10a+4b=4\]Solve it: $a=0.6, b=-0.5$\\
+\textbf{(b)} we have the same function g(x)=ax+b=f(x) from (a). So we just calc the the sums and the normal equations to solve a and b:\\
+The sums:
+\[\sum_{i=0}^2 x_i^2=0.02 \sum_{i=0}^2 x_i=0 \sum_{i=0}^2 x_i*y_i=0 \sum_{i=0}^2 y_i=4.3\]The normal equations:
+\[0.02a+0b=0\]
+\[0a+3b=4.3\]Solve it: a=0 b$\approx$1.433\\
+\textbf{(c).}
+\[\varphi '(a)=\sum_{i=0}^2 2(ax_i^2+b-y_i)x_i^2=0 (I)\implies\]
+\[\varphi '(b)=\sum_{i=0}^2 2(ax_i^2+b-y_i)=0 (II)\implies\]
+\[\implies(I) a\sum_{i=0}^2 x_i^4+b\sum_{i=0}^2 x_i^2=\sum_{i=0}^2 x_i^2\times y_i\]
+\[\implies(II) a\sum_{i=0}^2 x_i^2+(m+1)b=\sum_{i=0}^2 y_i \]
+The sums:\[\sum_{i=0}^2 x_i^4=2 ,\sum_{i=0}^2 x_i^2=2, \sum_{i=0}^2 x_i^2*y_i=6 ,\sum_{i=0}^2 y_i=6.9\]The normal equations:
+\[2a+2b=6\]
+\[2a+3b=6.9\]Solve it: a=2.1 b=0.9\\
+% \begin{center}
+%     \includegraphics[width=0.6\textwidth]{73sor.png}
+% \end{center}
+\newpage
+\subsection{the method of least squares with non-polynomial functions}
+\textbf{(a).}
+\[\varphi '(\alpha)=\sum_{i=0}^3 2(\alpha sin(x_i)+\beta cos(x_i)-y_i)sin(x_i)=0 (I)\implies\]
+\[\varphi '(\beta)=\sum_{i=0}^3 2(\alpha sin(x_i)+\beta cos(x_i)-y_i)cos(x_i)=0 (II)\implies\]The normal equations:
+\[\implies (I) \alpha \sum_{i=0}^3 sin^2(x_i)+\beta \sum_{i=0}^3 sin(x_i)cos(x_i)=\sum_{i=0}^3 sin(x_i)y_i\]
+\[\implies(II) \alpha \sum_{i=0}^3 sin(x_i)cos(x_i)+\beta \sum_{i=0}^3 cos^2(x_i)=\sum_{i=0}^3 cos(x_i)y_i\]
+The sums:
+\[\sum_{i=0}^3 sin^2(x_i)\approx 2.888,\sum_{i=0}^3 sin(x_i)cos(x_i)\approx-0.333,\sum_{i=0}^3 sin(x_i)y_i\approx-0.0348,\]
+\[\sum_{i=0}^3 cos^2(x_i)\approx1.112,\sum_{i=0}^3 cos(x_i)y_i=3.225\]
+The normal equations:
+\[2.888\alpha-0.333\beta=-0.0348\]
+\[-0.333\alpha+1.112\beta=3.225\]Solve it: \[a\approx0.3339 b\approx3.0002\]
+\textbf{(b).}
+\[\varphi '(c)=\sum_{k=0}^m -2e^{x_k}[f(x_k)-ce^{x_k}]=0\implies c\sum_{k=0}^m e^{2x_k}=\sum_{k=0}^m e^{x_k}f(x_k)\]So constant c will be:
+\[c=\frac{\sum_{k=0}^m e^{x_k}f(x_k)}{\sum_{k=0}^m e^{2x_k}}\]makes the expression as small as possible
+\newpage
+\subsection{Least Squares for Over-determined Systems}
+\textbf{(a).Consider the Over-determined system.}
+\\
+\textbf{(b).Determine the “best solution” (in the least square sense) for the following system}
+\\
+\textbf{(c).Now, expression the system in matrix-vector form}
+\newpage
+\subsection{The method of least squares in Matlab}
+\textbf{a.}
+\begin{minted}{matlab}
+>> xk=[0:0.1:1];
+>> yk=[0.7829 0.8052 0.5753 0.5201 0.3783 0.2923 0.1695 0.0842 0.0415 0.009 0];
+>> p1=polyfit(xk,yk,1);
+>> p2=polyfit(xk,yk,2);
+>> p4=polyfit(xk,yk,4);
+>> p8=polyfit(xk,yk,8);
+>> x1=linspace(0,1);
+>> y1=polyval(p1,x1);
+>> x2=linspace(0,1);
+>> y2=polyval(p2,x2);
+>> x3=linspace(0,1);
+>> x4=linspace(0,1);
+>> y4=polyval(p4,x4);
+>> x8=linspace(0,1);
+>> y8=polyval(p8,x8);
+>> plot(xk,yk,'ro');
+>> hold on
+>> plot(x1,y1,'b')
+>> title('first')
+>> hold off
+>> plot(xk,yk,'ro');
+>> hold on
+>> plot(x2,y2,'b')
+>> hold off
+>> plot(xk,yk,'ro');
+>> hold on
+>> plot(x4,y4,'b')
+>> hold off
+>> hold off
+>> plot(xk,yk,'ro');
+>> hold on
+>> plot(x8,y8,'b')
+\end{minted}
+First order polynomials best fit the data
+\begin{center}
+    \includegraphics[width=0.6\textwidth]{861.png}
+\end{center}
+Second 
+\begin{center}
+    \includegraphics[width=0.6\textwidth]{862.png}
+\end{center}
+Fourth
+\begin{center}
+    \includegraphics[width=0.6\textwidth]{864.png}
+\end{center}
+Eighth
+\begin{center}
+    \includegraphics[width=0.6\textwidth]{868.png}
+\end{center}
+\newpage
+\subsection{Least squares approximation of functions}
+we could re-write g(x) as g(x)=$ag_1(x)+bg_2(x)$ we found they are orthogonal to each other. So we could use the equations from the slides to solve the questions:
+\[a=\frac{-\int_{-1}^0 cos\pi x dx+\int_0^1 cos\pi xdx}{\int_{-1}^1 cos^2\pi xdx}=0\]
+\[b=\frac{-\int_{-1}^0 sin\pi xdx+\int_0^1 sin\pi xdx}{\int_{-1}^1 sin^2\pi xdx}=\frac{4}{\pi}\]
+\end{document}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%
+%\subsection*{Problem 2: Error Propagation}\index{error propagation}
+\subsection{Error Propagation}\index{error propagation}
+Perform a detailed study for the error propagation
+for the following computations:
+\begin{itemize}
+\item[(A)] $z=xy$
+\item[(B)] $z=5x+7y$
+\end{itemize}
+
+\end{minted}
+From the results, we know when w=1.5,the number of nit is the smallest one(1). Then plot it:
+\begin{minted}{matlab}
+p=[67,55,45,36,28,19,20,29,46,91]
+q=[1:0.1:1.9]
+plot(q,p)
+\end{minted}
+\begin{center}
+    \includegraphics[width=0.6\textwidth]{73sor.png}
+\end{center}
+\newpage
+\subsection{Jacobi iterations in Matlab}
+\begin{minted}{matlab}
+function [x,nit]=jacobi(A,b,x0,tol,nmax)
+% Inputs:
+% A : an n x n-matrix,
+% b : the rhs vector, with length n
+% x0 : the start vector for the iteration
+% tol: error tolerance
+% Outputs::
+% x : the solution vector
+% nit: number of iterations
+  x = x0;
+  n = length(x);
+  nit = 0;
+  while nit<nmax && norm(A*x-b)>tol
+      equu=zeros(n,1);
+      for i=1:n;
+          aii=A(i,1);
+          equ1=sum(A(i,1:n)' .*x)-aii*x(i);
+          equu(i)=(b(i)-equ1)/aii;
+      end
+      x=equu;
+      nit=nit+1;
+  end
+
+\section*{}
+\setcounter{section}{5}
+\subsection{Bisection in Matlab}
+\textbf{(a).} 
+\begin{minted}{matlab}
+function r=bisection(f,a,b,tol,nmax)
+% function r=bisection(f,a,b,tol,nmax)
+% inputs: f: function handle or string
+% a,b: the interval where there is a root
+% tol: error tolerance
+% nmax: max number of iterations
+% output: r: a root
+    if f(a)*f(b)>0 
+        disp('f(a)*f(b) not less than zero.')
+        r='r not found';
+    else
+        r = (a + b)/2;
+        err = abs(f(r));
+        iter=0;
+        while err > tol && iter<=nmax &&(b-a)>tol
+             if f(a)*f(r)<0 
+                 b = r;
+             else
+                a = r;          
+             end
+            r = (a + b)/2; 
+            err = abs(f(r));
+            iter=iter+1;
+        end
+    end
+end
+\end{minted}
+\newpage
+\textbf{(b).}
+\begin{minted}{matlab}
+>> f = @(x) 9*x^4 +18*x^3 + 38*x^2 -57*x +14;
+>> a=0;
+>> b=1;
+>> tol=1e-6;
+>> nmax=100;
+>> r=bisection(f,a,b,tol,nmax);
+f(a)*f(b) not less than zero.
+>> r
+
+    0.4450
+
+   1.000124747335887
+   0.998965197849302
+   1.003791255212411
+   0.992141543508981
+   1.009388954354586
+   0.995684476889867
+   0.994051957277281
+   1.014654730622059
+   0.983414871976230
+   1.012579528046927
+   0.993030429478400
+   1.002907983558429
+   0.999077726021763
+   1.000221673914519
+   0.999960147116320
+   1.000005230110332
+   0.999999518677854
+   1.000000029049191
+   0.999999998984420
+   1.000000000015243
+\end{minted}
+The naive Gaussian get a better result(since pivoting has a warning) in case(iii) but it has much more larger error than pivoting version, which means pivoting version has smaller errors.
+\newpage
+
+  for j = 1:i-1
+    sol = [d(j) a(n-j+1); a(j) d(n-j+1)] \ [b(j); b(n-j+1)];
+    %forward elimination
+    x(j) = sol(1);
+    %Backward elimination:
+    x(n-j+1) = sol(2);
+  end
+end
+\end{minted}
+\textbf{test for n=7}
+\begin{minted}{matlab}
+>> a=ones(7,1);
+d=4*ones(7,1);
+A=sparse(zeros(7,7));
+for i = 1:7
+A(i, 7 - i + 1) = a(7 - i + 1);
+A(i, i) = d(i,1);
+end
+x=ones(7,1);
+b=A*x;
+xa=GaussianX(7,d,a,b)
+xa =
+   (1,1)      1.000000000000000
+   (1,2)      1.000000000000000
+   (1,3)      1.000000000000000
+   (1,4)      1.000000000000000
+   (1,5)      1.000000000000000
+   (1,6)      1.000000000000000
+   (1,7)      1.000000000000000
+\end{minted}
+\textbf{test for n=9}
+\begin{minted}{matlab}
+>> a=ones(9,1);
+d=4*ones(9,1);
+A=sparse(zeros(9,9));
+for i = 1:9
+A(i, 9 - i + 1) = a(9 - i + 1);
+A(i, i) = d(i,1);
+end
+x=ones(9,1);
+b=A*x;
+xa=GaussianX(9,d,a,b)
+xa =
+   (1,1)      1.000000000000000
+   (1,2)      1.000000000000000
+   (1,3)      1.000000000000000
+   (1,4)      1.000000000000000
+   (1,5)      1.000000000000000
+   (1,6)      1.000000000000000
+   (1,7)      1.000000000000000
+   (1,8)      1.000000000000000
+   (1,9)      1.000000000000000
+\end{minted}
+\textbf{test for n=11}
+\begin{minted}{matlab}
+>> a=ones(11,1);
+d=4*ones(11,1);
+A=sparse(zeros(11,11));
+for i = 1:11
+A(i, 11 - i + 1) = a(11 - i + 1);
+A(i, i) = d(i,1);
+end
+x=ones(11,1);
+b=A*x;
+xa=GaussianX(11,d,a,b)
+xa =
+   (1,1)      1.000000000000000
+   (1,2)      1.000000000000000
+   (1,3)      1.000000000000000
+   (1,4)      1.000000000000000
+   (1,5)      1.000000000000000
+   (1,6)      1.000000000000000
+   (1,7)      1.000000000000000
+   (1,8)      1.000000000000000
+   (1,9)      1.000000000000000
+   (1,10)     1.000000000000000
+   (1,11)     1.000000000000000
+\end{minted}
+\end{document}
+
+    45
+    >> [x, nit] = sor(A, b, x0, 1.3, 4, 1e-4, 100)
+
+    0.0000         0         0         0         0
+    1.5708    2.0944         0         0         0
+    1.8961    2.0046    1.9986         0         0
+    1.9742    2.0003    2.0000    2.0000         0
+    1.9936    2.0000    2.0000    2.0000    2.0000
+%Error:
+>> diag(abs(diag(R-quad('frn',0,pi))))
+
+    36
+    >> [x, nit] = sor(A, b, x0, 1.4, 4, 1e-4, 100)
+
+    46
+    >> [x, nit] = sor(A, b, x0, 1.9, 4, 1e-4, 100)
+
+\textbf{There is nothing to turn in here. Just have fun and get used to Matlab!}
+
+\paragraph{(c).} Write $(64.625)_{10}$ into normalized scientific notation in binary. 
+You could use the result in the previous problem. 
+Then determine how it would look like in  a 32-bit computer,
+using a single-precision floating point representation.
+
+\title{ Homework 4}
+\author{}
+
+    0.8293
+    0.6727
+    0.5257
+    0.3846
+    0.2462
+    0.1074
+   -0.0347
+   -0.1834
+   -0.3420
+
+    91
+
+   1.6666e-01            0            0            0            0
+            0   2.8588e-02            0            0            0
+            0            0   8.9030e-03            0            0
+            0            0            0   3.0520e-03            0
+            0            0            0            0   1.0667e-03
+
+\section*{}
+\setcounter{section}{9}
+\subsection{Scalar ODE}
+\textbf{(a).}
+\[h=0.1,t_0=1,t_1=1.2,x_0=1,for:m=1
+\]we have the forward Euler step:
+\[x_{k+1}=x_k+h(2x_k^2+x_k-1)\]
+\[x_1=x_0+h(2x^2+x-1)=1+(0.1)(2(1)^2+1-1)=1.2\]
+\[x_2=1.2+0.1(2(1.2)^2+1.2-1)=1.508\]
+\textbf{(b).Heun's}Based on the book(P224)
+\[x_{k+1}=x_k+\frac{1}{2}(K_1+K_2)\]
+where
+\[K_1=h*f(t_k,x_k)\]\[K_2=h*f(t_k+h,x_k+K_1)\]
+Now\[K_1=0.1(2)=0.2,K_2=0.1(2(1.2^2)+1.2-1)=0.308\]SO
+\[x_1(1.1)=1+\frac{0.2+0.308}{2}=1.254\]
+Now for\[x_2=x_1+\frac{K_1+K_2}{2}\]
+The new $K_1$ and $K_2$:
+\[K_1\approx0.3399, K_2\approx0.5675\]Then we get 
+\[x_2(1.2)=1.254+\frac{0.3399+0.5675}{2}=1.7077\]
+\textbf{(c).}
+\begin{align*}
+    k&=0\\
+    K_1&=0.1*(2(1)^2)=0.2\\
+    K_2&=0.1*(2(1.1)^2+0.1)=0.252\\
+    K_3&=0.1*(2(2.252/2)^2+2.252/2-1)=0.2661752\\
+    K_4&=0.1*(2(1+0.2661752)^2+0.2661752)\approx0.3473\\
+    x_1(1.1)&=1+\frac{0.2+2*0.252+2*0.2661752+0.3473}{6}\approx1.2639\\
+    k&=1,\\
+    K_1&=0.348579\\
+    K_2&=0.459585\\
+    K_3&=0.494547\\
+    K_4&=0.694272\\
+    x_2(1.2)&=1.7557525
+\end{align*}
+\textbf{(d).}
+\[x_{n+1}=x_n+\frac{3hf(t_n,x_n)}{2}-\frac{hf(t_{n-1},x_{n-1})}{2}\]
+\[x_0=1,x_1=1.254,t_0=1,t_1=1.1\]
+\[x_2(1.2)=x_1+\frac{3*0.1*f(1.1,1.254)}{2}-\frac{0.1*f(1,1)}{2}=1.66385\]
+\[x_3(1.3)=x_2+\frac{3*0.1*f(1.2,1.66385)}{2}-\frac{0.1*f(1.1,1.254)}{2}=2.42399\]
+\newpage
+\subsection{Solving ODE backward in time}
+Taylor series method of order 2:
+\[t_0=0,x_0=2,h=-0.2\] we want to compute x(-0.2)
+\[x''(t)=-x^2-2tx*x',x''(0)=-4,x'(0)=0\]
+\[x(-0.2)=2-0.2*(0)+\frac{(-0.2)^2}{2}*(-4)=1.92\]
+The Runge-Kutta method of order 2
+\[x_1(-0.2)=x_0+\frac{K_1+K_2}{2}\]
+\[K_1=-0.2*0=0,K_2=-0.2*f(-0.2,2)=-0.2*(0.2*4)=-0.16\]
+\[x_1(-0.2)=2+\frac{-0.16}{2}=1.92\]
+\newpage
+\subsection{A simple high order ODE}
+\textbf{(a).}
+\[x'(t)=y(t)\implies y'(t)=x''\implies y''(t)=x'''(t)\implies y''(t)=-2y'+xt\]
+\[y'=z\implies z'=y'',z(0)=3\]
+\[\begin{array}{c|c}
+   x'=y  & x(0)=1  \\
+    y'=z & y(0)=2\\
+    z'=-2z+xt & z(0)=3
+\end{array}\]
+\textbf{(b).}
+\begin{align*}
+    z_{t+1}=z_t+0.1(-2z+xt)\\
+    y_{t+1}=y_t+0.1(z_t)\\
+    x_{t+1}=x_t+0.1(y_t)
+\end{align*}
+\[x_0=1,y_0=2,z_0=3\]
+We could re-write in x with 123 \[
+\begin{array}{c|c}
+    x_1'=x_2 & x_1(0)=1 \\
+    x_2'=x_3 & x_2(0)=2  \\
+    x_3'=-2x_3+ x_1*t&x_3(0)=3
+\end{array}\]
+\textbf{(c).}
+\begin{minted}{matlabsession}
+>> f1=@(x1,x2,x3,t) x2;
+>> %functions for Euler equation solution
+>> f1=@(x1,x2,x3,t) x2;
+>> f2=@(x1,x2,x3,t) x3;
+>> f3=@(x1,x2,x3,t) -2*x3+x1*t;
+>> h=0.1;
+>> x10=1;
+>> x20=2;
+>> x30=3;
+>> t0=0;
+>> tn=t0:h:1;
+>> x11(1)=x10;x22(1)=x20;x33(1)=x30;t11(1)=t0;
+>> for i=1:length(tn)-1
+t11(i+1)=t11(i)+h;
+x11(i+1)=x11(i)+h*(f1(x11(i),x22(i),x33(i),t11(i)) );
+x22(i+1)=x22(i)+h*(f2(x11(i),x22(i),x33(i),t11(i)) );
+x33(i+1)=x33(i)+h*(f3(x11(i),x22(i),x33(i),t11(i)) );
+end
+>> fprintf('The value of x(t) at t=%f is %f.\n',t11(end),x11(end))
+The value of x(t) at t=1.000000 is 3.861614.
+>> plot(t11,x11)
+\end{minted}
+\simplot{9_3c.png}
+\newpage
+\subsection{Higher Order ODEs with various methods}
+\[\begin{array}{cc}
+    x_1'(t)=x_2 & x_1(0)=1 \\
+    x_2'(t)=tx_1 & x_2(0)=1
+\end{array}\]
+\[t_0=0=t_1,x_0=1=x_1,h=0.1\]
+\textbf{(a).Euler’s method,}
+\[x_1(0.1)=x_0+h(f(0,1))=1+0.1*1=1.1\]
+\[x_2(0.2)=x_1+h(f(0,1.1))=1.1+0.1=1.2\]
+\textbf{(b) 2nd order Runge-Kutta method,}
+\[x_{k+1}=x_k+\frac{1}{2}(K_1+K_2)\]
+where
+\[K_1=h*f(t_k,x_k)=0.1*1=0.1\]\[K_2=h*f(t_k+h,x_k+K_1)=0.1\]so
+\[x_1(0.1)=1+0.1=1.1\]For x2,the K1 and K2 both equal 0.1\[x_2(0.2)=1.1+0.1=1.2\]
+\textbf{(c).A 4th order Runge-Kutta method,}
+\begin{align*}
+    k&=0\\
+    K_1&=0.1\\
+    K_2&=0.1\\
+    K_3&=0.1\\
+    K_4&=0.1\\
+    x_1(0.1)&=1+\frac{0.1+0.2+0.2+0.1}{6}=1.1\\
+    k&=1,\\
+    K_1&=0.1\\
+    K_2&=0.1\\
+    K_3&=0.1\\
+    K_4&=0.1\\
+    x_2(0.2)&=1.2
+\end{align*}
+\textbf{(d).2nd order Adams-Bashforth-Moulton method.}
+
+   0.459697694131821
+%ii):
+>> quad('frn',0,1,1e-9)
+
+%\def\bel{\begin{equation}\label}
+\def\eeq{\end{equation}}
+\newcommand{\abs}[1]{\left| #1 \right|}
+\def\beqn{\begin{eqnarray*}}
+\def\eeqn{\end{eqnarray*}}
+
+%
+\subsection*{How you do it:}
+
+\verb+http://www.math.mtu.edu/~msgocken/intro/intro.pdf+
+
+    0.6667
+\end{minted}
+We found r=0.6667 when interval is between 0.5 and 1
+\newpage
+\textbf{(c).} 
+\begin{minted}{matlab}
+>> f = @(x) tan(x)-x;
+>> a=1;
+>> b=2;
+>> r=bisection(f,a,b,tol,nmax);
+>> r
+
+   9.4577e-01
+%formula for trapezoid
+function v = trapezoid(f, a, b, n)
+    % where funItg.m is the name of the file of the function f(x), 
+    % and a,b is the interval, 
+    % and n is the number of sub-intervals
+    h = (b - a) / n;
+    x = a + h:h:b - h;
+    v = ((feval(f, a) + feval(f, b)) / 2 + sum(feval(f, x))) * h;
+end
+\end{minted}
+\newpage
+\textbf{(b).}
+Now we have: $T(f, h)$, $T(f, h/3)$, $T(f, h/9)$.
+Based on the slides, we get:
+\[\begin{array}{lll}
+E(f,h)&=I(f)-T(f, h)&=\sum^{n/2}_{i=1} a_{2i}h^{2i}(1)\\
+E(f,h/3)&=I(f)-T(f, h/3)&=\sum^{n/2}_{i=1} a_{2i}(h/3)^{2i}(2)\\
+E(f,h/9)&=I(f)-T(f, h/9)&=\sum^{n/2}_{i=1} a_{2i}(h/9)^{2i}
+\end{array}\]
+Hear $a_n$ depending on the derivative $f^{(n)}$(From Slides Proof can be achieved by Talor series).\\
+We could re-write $I(f)$ like following:
+\begin{align*}
+I(f)&=T(f,h)+E(f,h)\\
+I(f)&=T(f,h/3)+E(f,h/3)\\
+I(f)&=T(f,h/9)+E(f,h/9)
+\end{align*}
+The goal: cancel the leading error term to get a higher order approximation.
+Multiplying (2) by $3^2$ and subtract (1), we get
+\begin{align*}
+(3^2-1)\times I(f)&=(T(f,\frac{h}{3})+E(f, h/3))\times 3^2-(T(f, h) + E(f, h))\\
+I(f) &=\underbrace{\frac{9}{8} T(f,\frac{h}{3})-\frac13 T(f, h)}_{U(h)}+\sum_{i=2} \tilde a_{2i}h^{2i}
+\end{align*}
+So:
+$U(h)=\frac{3^2\times T(f,\frac{h}{3})-T(f, h)}{3^2-1}$\\
+We may follow this to derive the Romberg's $R(n, m)$ formula:\\
+$R(n, m)=R(n, m-1)+\frac{R(n, m-1)-R(n-1,m-1)}{3^{2m}-1}$
+The triangle calc by romberg.m:
+\[\begin{array}{cccc}
+n&R(n, 0)&R(n, 1)&R(n, 2)\\
+0&0.920735492403948&0&0\\
+1&0.939793284806177&0.946145882273587&0\\
+2&0.944513521665390&0.946086933951794&0.946083004063674
+\end{array}\]
+So the approximation is $0.946083004063674$.
+\newpage
+\subsection{Gaussian Quadrature and Beyond}
+\textbf{(a).}
+Since we have 4 nodes, So $N=3$, and\\
+$\int^1_{-1} f(x)dx\approx \sum^3_0 a_i\times  f(x_i)$\\
+For polynomials of degree $<7$ ($\leq 6$), we only need to check with
+$f(x)=1, x^2, x^4, x^6$ (other cases are symmetry):
+\begin{align*}
+f(x)&=1  :& 2a_0+2a_1&=2\\
+f(x)&=x^2:&\sum^3_{i=0} a_i \times x_i^2&=\frac{2}{3}\\
+f(x)&=x^4:&\sum^3_{i=0} a_i \times x_i^4&=\frac{2}{5}\\
+f(x)&=x^6:&\sum^3_{i=0} a_i \times x_i^6&=\frac{2}{7}
+\end{align*}
+All the values of $a_i$ and $x_i$ given by questions,and all polynomials of degree $\leq 6$ view it as a linear combination of $f(x)=1, x, x^2, ... , x^6$, which will get the above equations.
+\newpage
+\textbf{(b).}
+Given $x_0=-0.5, x_1=0, x_2=0.5$, we get:
+\begin{align}
+f(x)&=1  :& 2a_0+a_1&=2\\
+f(x)&=x^2:& 2a_0\times(-0.5)^2&=\frac{2}{3}
+\end{align}
+Based on symmetry, $a_0=a_2$, we solve $a_0=\frac{4}{3}$ by the equation(2), so $a_2=\frac{4}{3}$. Then by the equation(1), $a_1=-\frac{2}{3}$. Then we have:\\
+$a_0=\frac{4}{3}, a_1=-\frac{2}{3}, a_2=\frac{4}{3}$\\
+\newpage
+\textbf{(c).}
+Given $x_0=-a, x_1=a$, and $a_0=a_1=w$, we get:
+\begin{align}
+f(x)&=1  :& 2w+w&=2\\
+f(x)&=x^2: & 2w\times a^2&=\frac{2}{3}
+\end{align}
+Solving the equation(3), we get $w=\frac{2}{3}$,\\and the equation(4) get $a=\frac1{\sqrt2}$. \\Then we have:\\
+$w=\frac{2}{3}, a=\frac{1}{\sqrt 2}$\\
+\end{document}
+
+>> x=A\b
+
+\section*{}
+\setcounter{section}{10}
+\subsection{Linear Shooting Method for a Two-point Boundary Value Problem} 
+\textbf{(a).}
+\[\begin{aligned}
+y''=y'+2y+cos(x),y(0)=-0.3,y(\frac{\pi}{2})=-0.1\\
+\text{put exact solution to the differential equation left}\\
+y''=-\frac{1}{10}\left(-\sin \left(x\right)-3\cos \left(x\right)\right)\\
+\implies \frac{\sin \left(x\right)+3\cos \left(x\right)}{10}\\
+\text{put exact solution to the differential equation right}\\
+-\frac{1}{10}\left(\cos \left(x\right)-3\sin \left(x\right)\right)+2*(-\frac{sin\left(x\right)+3\cdot \:\:cos\left(x\right)}{10})+cos(x)\\
+\implies \frac{\sin \left(x\right)+3\cos \left(x\right)}{10}\\
+\text{we get same answer from the two sides,so the exact solution given is correct}\\
+\end{aligned}
+\]
+\textbf{(b).}First the ode shooting method (shooting.m) is used to find the solution of the BVP.\\
+\begin{minted}{matlab}
+    function g=shooting(t,x)
+    %x(1)=y,x(2)=y'
+    g=zeros(size(x));%intial the and create zeros of size of x
+    g(1)=x(2);
+    g(2)=x(2)+2*x(1)+cos(t);
+    %[t,xa]=ode45(@shooting,tspan,y0);
+end
+%run hw10_1.m to see the solution of the BVP
+    %yo is for first shoot guess \bar{y(a=0)}'=0(guess),
+    %y1 is for the second one \tilde{y(a=0)}'=1(guess)
+    y0=[-0.3;0];tspan=[0 pi/2];
+    [t,xa]=ode45(@shooting,tspan,y0);
+    y1=[-0.3;1];
+    [t,xb]=ode45(@shooting,tspan,y1);
+    %length
+    N1=length(xa(:,1));
+    N2=length(xb(:,1));
+    %calculate the lamda we need to find the last one of vector xa and xb
+    %xa(:,1) is the first column of xa,xb(:,1) is the first column of xb
+    %xa(N1,1) is the last element of xa,xb(N2,1) is the last element of xb
+    Lamda=(-0.1-xb(N2,1))/(xa(N1,1)-xb(N2,1));
+    %calculate the y(x) with lamda 
+    %so y(x)=Lamda*\bar{y(a=0)}'+(1-Lamda)*\tilde{y(a=0)}'
+    %y(x)=Lamda*0+(1-Lamda)*1 for my answer
+    y2=[-0.3;1-Lamda];
+    [t,xs]=ode45(@shooting,tspan,y2);
+    %for error
+    figure(1),plot(t,xs(:,1),'r');
+    print -dpng hw10_1_my.png;
+    y=-(1/10)*(sin(t)+3*cos(t));
+    error=abs(xs(:,1)-y);
+    figure(2),plot(t,error);
+    print -dpng hw10_1_error.png;
+\end{minted}
+\simplot{hw10_1_my.png}
+\simplot{hw10_1_error.png}
+\newpage
+\subsection{More Practice on Linear Shooting Method}
+\textbf{(a).}we have $u(x)=x^3-x$
+\[\begin{aligned}
+    \text{left side we use exact solution to plug in is }y''+6u=6x+6x^3-6x=6x^3\\
+    \text{We found both sides are the same,so the exact solution is correct}\\
+\end{aligned}
+\]
+\textbf{(b).Explain in detail how to solve this problem with the shooting method.}
+First,we need to solve same equation with different initial conditions:\\
+$\bar{u}(0)=0$,$\bar{u}'(0)=0$\\
+$\tilde{u}(0)=0$,$\tilde{u}'(0)=1$\\
+Use these intial guess to get ode45 then use the last element of the solution to get the lamda.\\
+Use the lamda to get the y(x) to get the solution.\\
+\textbf{(c).Implement your algorithm in Matlab. Use Matlab solver ode45, with your choice of error
+tolerance. Plot the solution on}$0 \leq x \leq 1$.\\
+Here is my moreshooting function:
+\begin{minted}{matlab}
+function g=moreshooting(t,x)
+%x(1)=(\bar)u,x(2)=(\bar)u'
+%x(3)=(\tilde)u,x(4)=(\tilde)u'
+g=zeros(size(x));
+g(1)=x(2);
+g(2)=6*t^3-6*x(1);
+g(3)=x(4);
+g(4)=6*t^3-6*x(3);
+end
+\end{minted}
+Following is my command to run my moreshooting function to see the solution of the BVP:
+\begin{minted}{matlab}
+    %(hw10_2.m)
+    %y0 is for first and second shoot guess
+    y0=[0  ;0;  0;  1];tspan=[0 1];
+    [t,xa]=ode45(@moreshooting,tspan,y0);
+    N=length(xa(:,1,:,1));
+    Lamda=(0-xa(N,3))/(xa(N,1)-xa(N,3));
+    y1=[0;1-Lamda;0;0];
+    [t,xs]=ode45(@moreshooting,tspan,y1);
+    figure(1),plot(t,xs(:,1),'r');
+    print -dpng hw10_2_my.png;
+    %for error
+    y=t.^3-t;
+    error=abs(xs(:,1)-y);
+    figure(2),plot(t,error);
+    print -dpng hw10_2_error.png;
+    figure(3),plot(t,y);
+\end{minted}
+\simplot{hw10_2_my.png}
+\simplot{hw10_2_error.png}
+\newpage
+\subsection{Non-linear Shooting for a Two-point Boundary Value Problem}
+\textbf{(a).Show that the exact solutions is}
+\[
+\begin{aligned}
+    \text{left side we use exact solution to plug in is }y''=-sin(x)\\
+    \text{right side is }-cos^2(x)-sin(x)+cos^2(x)=-sin(x)\\
+    \text{We found both sides are the same,so the exact solution is correct}\\    
+\end{aligned}
+\]
+\textbf{(b).}my function is:
+\begin{minted}{matlab}
+    %nlshooting.m is my function to solve the Non-linear shooting for a two-point BVP
+    function g=nlshooting(t,x)
+    %x(1)=y,x(2)=y'
+    g=zeros(size(x));
+    g(1)=x(2);
+    g(2)=-(x(2))^2-x(1)+cos(t)*cos(t);
+    end
+\end{minted}
+My command to run my nlshooting function to see the solution of the BVP:
+\begin{minted}{matlab}
+    %(hw10_3.m)
+    clear;
+    z1=0;z2=1;
+    tol=abs(z2-z1);
+    nmax=0;
+    tspan=[0 pi];
+    y0=[0;z1];
+    y1=[0;z2];
+    while tol>10^(-9) && nmax <6
+        [t,xa]=ode45(@nlshooting,tspan,y0);
+        [t,xb]=ode45(@nlshooting,tspan,y1);
+        N1=length(xa(:,1));
+        N2=length(xb(:,1));
+        phi=z2+(0-xb(N2,1))*(z2-z1)/(xb(N2,1)-xa(N1,1));
+        z1=z2;
+        z2=phi;
+        tol=abs(z2-z1);
+        nmax=nmax+1;
+    end
+    y2=[0;phi];
+    [t,xs]=ode45(@nlshooting,tspan,y2);
+    figure(1), plot(t,xs(:,1),'r');
+    hold on;
+    plot(t,sin(t),'b');
+    legend('mysol','exactsol');
+    print -dpng hw10_3_my.png;
+    hold off;
+    figure(2),plot(t,abs(xs(:,1)-sin(t)));
+    print -dpng hw10_3_error.png;
+\end{minted}
+\simplot{hw10_3_my.png}
+\simplot{hw10_3_error.png}
+\newpage
+\subsection{Finite Difference Method in 1D}
+\textbf{(a).}
+\[
+\begin{aligned}
+y''=y'+2y+cos(x),y(0)=-0.3,y(\frac{\pi}{2})\\
+y'(x_i)=\frac{y_{i+1}-y_{i-1}}{2h}\\
+y''(x_i)=\frac{y_{i+1}-2y_i+y_{i-1}}{h^2}\\
+y_{i+1}(\frac{1}{h^2}-\frac{1}{2h})+y_i(\frac{-2}{h^2}-2)+y_{i-1}(\frac{1}{h^2}+\frac{1}{2h})=cos(x_i)\\
+\end{aligned}
+\]The matrix is:
+\[
+\begin{array}{ccccc|c}
+    \frac{-2}{h^2}-2&\frac{1}{h^2}-\frac{1}{2h}&0&0&0&cos(x_1)+0.3(\frac{1}{h^2}+\frac{1}{2h})\\
+    \frac{1}{h^2}+\frac{1}{2h}&\frac{-2}{h^2}-2&\frac{1}{h^2}-\frac{1}{2h}&0&0&cos(x_2)\\
+    0&0&0&\frac{1}{h^2}+\frac{1}{2h}&\frac{-2}{h^2}-2&cos(x_N)+0.1(\frac{1}{h^2}+\frac{1}{2h})
+\end{array}    
+\]
+\textbf{(b).}I have two method to test for B.Following is method 1.Method 2 is let Matrix A and B both side times $h^2$,Test for N=10
+\begin{minted}{matlab}
+    clear;
+    % right hand equation
+    f=@(x) cos(x);
+    %Test for N=10
+    N=10;
+    a=0;b=pi/2;
+    h=(b-a)/N;x=a:h:b;
+    %Matrix A:
+    A(1,1)=(-2/(h)^2)-2;
+    A(1,2)=(1/(h)^2)-(1/(2*h));
+    for i=2:N-2
+        A(i,i-1)=(1/(h)^2)+(1/(2*h));
+        A(i,i)=(-2/(h)^2)-2;
+        A(i,i+1)=(1/(h)^2)-(1/(2*h));
+    end
+    A(N-1,N-2)=(1/(h^2))+(1/(2*h));
+    A(N-1,N-1)=(-2/(h)^2)-2;
+    %Matrix B:
+    %y0=alpha,yN=beta
+    y0=-0.3;yN=-0.1;
+    b(1)=f(x(1))-y0*((1/(h^2))+(1/(2*h)));
+    for i=2:N-2
+        b(i)=f(x(i+1));
+    end
+    b(N-1)=f(x(N-1))-yN*((1/(h^2))-(1/(2*h)));
+    %solve for matrix xsolution
+    xs=A\b';
+    y(1)=y0;
+    for i=2:N
+        y(i)=xs(i-1);
+    end
+    y(N+1)=yN;
+    figure(1),plot(x,y,'r');
+    print -dpng hw10_4_N10_my.png;
+    %exact solution
+    yex=-(1/10)*(sin(x)+3*cos(x));
+    error=abs(y-yex);
+    figure(2),plot(x,error,'b');
+    print -dpng hw10_4_N10_error.png;
+\end{minted}
+\simplot{hw10_4_N10_my.png}
+\simplot{hw10_4_N10_error.png}
+Test for N=20:
+\begin{minted}{matlab}
+clear;
+% right hand equation
+f=@(x) cos(x);
+%Test for N=20
+N=20;
+a=0;b=pi/2;
+h=(b-a)/N;x=a:h:b;
+%Matrix A:
+A(1,1)=(-2/(h)^2)-2;
+A(1,2)=(1/(h)^2)-(1/(2*h));
+for i=2:N-2
+    A(i,i-1)=(1/(h)^2)+(1/(2*h));
+    A(i,i)=(-2/(h)^2)-2;
+    A(i,i+1)=(1/(h)^2)-(1/(2*h));
+end
+A(N-1,N-2)=(1/(h^2))+(1/(2*h));
+A(N-1,N-1)=(-2/(h)^2)-2;
+%Matrix B:
+%y0=alpha,yN=beta
+y0=-0.3;yN=-0.1;
+b(1)=f(x(1))-y0*((1/(h^2))+(1/(2*h)));
+for i=2:N-2
+    b(i)=f(x(i+1));
+end
+b(N-1)=f(x(N-1))-yN*((1/(h^2))-(1/(2*h)));
+%solve for matrix xsolution
+xs=A\b';
+y(1)=y0;
+for i=2:N
+    y(i)=xs(i-1);
+end
+y(N+1)=yN;
+figure(1),plot(x,y,'r');
+print -dpng hw10_4_N20_my.png;
+%exact solution
+yex=-(1/10)*(sin(x)+3*cos(x));
+error=abs(y-yex);
+figure(2),plot(x,error,'b');
+print -dpng hw10_4_N20_error.png;
+\end{minted}
+\simplot{hw10_4_N20_my.png}
+\simplot{hw10_4_N20_error.png}
+Method 2 is let Matrix A and B both side times $h^2$, and finialy we found the tolerance is same.
+\begin{minted}{matlab}
+    clear;
+    %Test for N=10
+    N=10;
+    a=0;b=pi/2;
+    h=(b-a)/N;x=a:h:b;
+    % right hand equation
+    f=@(x) cos(x)*h^2;
+    %Matrix A:
+    A(1,1)=(-2-2*h^2);
+    A(1,2)=(1-h/2);
+    for i=2:N-2
+        A(i,i-1)=(1+h/2);
+        A(i,i)=(-2-2*h^2);
+        A(i,i+1)=(1-h/2);
+    end
+    A(N-1,N-2)=(1+h/2);
+    A(N-1,N-1)=(-2-2*h^2);
+    %Matrix B:
+    %y0=alpha,yN=beta
+    y0=-0.3;yN=-0.1;
+    b(1)=f(x(1))-y0*((1+h/2));
+    for i=2:N-2
+        b(i)=f(x(i+1));
+    end
+    b(N-1)=f(x(N-1))-yN*(1-h/2);
+    %solve for matrix xsolution
+    xs=A\b';
+    y(1)=y0;
+    for i=2:N
+        y(i)=xs(i-1);
+    end
+    y(N+1)=yN;
+    figure(1),plot(x,y,'r');
+    print -dpng hw10_4_M_N10_my.png;
+    %exact solution
+    yex=-(1/10)*(sin(x)+3*cos(x));
+    error=abs(y-yex);
+    figure(2),plot(x,error,'b');
+    print -dpng hw10_4_M_N10_error.png;
+\end{minted}
+\simplot{hw10_4_M_N10_my.png}
+\simplot{hw10_4_M_N10_error.png}
+Test for N=20:
+\begin{minted}{matlab}
+    clear;
+    %Test for N=20
+    N=20;
+    a=0;b=pi/2;
+    h=(b-a)/N;x=a:h:b;
+    % right hand equation
+    f=@(x) cos(x)*h^2;
+    %Matrix A:
+    A(1,1)=(-2-2*h^2);
+    A(1,2)=(1-h/2);
+    for i=2:N-2
+        A(i,i-1)=(1+h/2);
+        A(i,i)=(-2-2*h^2);
+        A(i,i+1)=(1-h/2);
+    end
+    A(N-1,N-2)=(1+h/2);
+    A(N-1,N-1)=(-2-2*h^2);
+    %Matrix B:
+    %y0=alpha,yN=beta
+    y0=-0.3;yN=-0.1;
+    b(1)=f(x(1))-y0*((1+h/2));
+    for i=2:N-2
+        b(i)=f(x(i+1));
+    end
+    b(N-1)=f(x(N-1))-yN*(1-h/2);
+    %solve for matrix xsolution
+    xs=A\b';
+    y(1)=y0;
+    for i=2:N
+        y(i)=xs(i-1);
+    end
+    y(N+1)=yN;
+    figure(1),plot(x,y,'r');
+    print -dpng hw10_4_M_N20_my.png;
+    %exact solution
+    yex=-(1/10)*(sin(x)+3*cos(x));
+    error=abs(y-yex);
+    figure(2),plot(x,error,'b');
+    print -dpng hw10_4_M_N20_error.png;
+\end{minted}
+\simplot{hw10_4_M_N20_my.png}
+\simplot{hw10_4_M_N20_error.png}
+\end{document}
+
+   9.4329e-01
+%when n=9
+>> v=trapezoid('funItg47', 0, 1, 9)
+
+R =
+
+   0.551129851948798
+
+    0.3333
+\end{minted}
+We found r=0.3333 when interval is between 0 and 0.5
+\begin{minted}{matlab}
+>> a=0.5;
+>> b=1;
+>> r=bisection(f,a,b,tol,nmax);
+>> r
+
+    0.8293
+    0.6727
+    0.5257
+    0.3846
+    0.2462
+    0.1074
+   -0.0348
+   -0.1835
+   -0.3420
+
+    0.8293
+    0.6728
+    0.5258
+    0.3847
+    0.2463
+    0.1075
+   -0.0347
+   -0.1834
+   -0.3420
+
+end
+Script:
+>>  A = diag(-2.011:-0.001:-2.019);
+>> for i = 1:length(A)-1
+ A(i+1,i)=1;
+ A(i,i+1)=1;
+end;
+>> b=[-0.994974 1.57407e-3 -8.96677e-4 -2.71137e-3 -4.07407e-3 -5.11719e-3 -5.92917e-3 -6.57065e-3 0.507084]';
+>> x0 = [0.95:-0.05:0.55]';
+>> [x, nit] = jacobi(A, b, x0, 1e-4, 100)
